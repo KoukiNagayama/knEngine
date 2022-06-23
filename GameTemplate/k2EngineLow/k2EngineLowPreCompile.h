@@ -77,8 +77,14 @@ using namespace Microsoft::WRL;
 
 #include "graphics/GaussianBlur.h"
 
+
 #include "ModelRender.h"
+#include "SpriteRender.h"
+#include "EdgeControl.h"
 #include "RenderingEngine.h"
+//#include "LevelRender.h"
+//#include "MapChipRender.h"
+
 
 const UINT FRAME_BUFFER_W = 1600;	// フレームバッファの幅。
 const UINT FRAME_BUFFER_H = 900;	// フレームバッファの高さ。
@@ -112,6 +118,7 @@ static const int MAX_BONE = 512;	// ボーンの最大数。
 #include "graphics/effect/EffectEngine.h"
 #include "sound/SoundSource.h"
 #include "graphics/effect/EffectEmitter.h"
+
 
 using namespace nsK2EngineLow;
 

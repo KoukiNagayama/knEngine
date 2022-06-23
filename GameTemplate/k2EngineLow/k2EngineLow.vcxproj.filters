@@ -228,6 +228,11 @@
     <ClCompile Include="ModelRender.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
     <ClCompile Include="Bloom.cpp" />
+    <ClCompile Include="SpriteRender.cpp" />
+    <ClCompile Include="FontRender.cpp" />
+    <ClCompile Include="EdgeControl.cpp" />
+    <ClCompile Include="MapChipRender.cpp" />
+    <ClCompile Include="LevelRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -505,6 +510,11 @@
     <ClInclude Include="ModelRender.h" />
     <ClInclude Include="RenderingEngine.h" />
     <ClInclude Include="Bloom.h" />
+    <ClInclude Include="SpriteRender.h" />
+    <ClInclude Include="FontRender.h" />
+    <ClInclude Include="EdgeControl.h" />
+    <ClInclude Include="MapChipRender.h" />
+    <ClInclude Include="LevelRender.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

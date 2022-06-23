@@ -1,6 +1,7 @@
 #include "k2EngineLowPreCompile.h"
 #include "ModelRender.h"
 #include "RenderingEngine.h"
+#include "EdgeControl.h"
 
 namespace nsK2EngineLow
 {
@@ -8,9 +9,11 @@ namespace nsK2EngineLow
 		AnimationClip* animationClips,
 		int numAnimationClips,
 		EnModelUpAxis enModelUpAxis,
-		int outlineType
+		int outlineType,
+		int maxInstance
 	)
 	{
+		//m_edgeControl = edgeControl;
 		// スケルトンを初期化。
 		InitSkeleton(filePath);
 		// アニメーションを初期化。
@@ -55,22 +58,6 @@ namespace nsK2EngineLow
 		modelInitData.m_tkmFilePath = filePath;
 		// シェーダーファイルのファイルパスを指定する。
 		modelInitData.m_fxFilePath = "Assets/shader/test.fx";
-		/*if (outlineType == 0) {
-			modelInitData.m_fxFilePath = "Assets/shader/edge.fx";
-		}
-		else if (outlineType == 1) {
-			modelInitData.m_fxFilePath = "Assets/shader/edgeFRorange.fx";
-		}
-		else if (outlineType == 2) {
-			modelInitData.m_fxFilePath = "Assets/shader/edgeFRred.fx";
-		}
-		else if (outlineType == 3) {
-			modelInitData.m_fxFilePath = "Assets/shader/edgeTitleText.fx";
-		}
-		else if (outlineType == 4) {
-			modelInitData.m_fxFilePath = "Assets/shader/whiteBoard.fx";
-		}*/
-
 		// エントリーポイントを指定する。
 		if (m_animationClips != nullptr) {
 			//スケルトンを指定する。
@@ -92,8 +79,8 @@ namespace nsK2EngineLow
 		// モデルの上方向を指定する。
 		modelInitData.m_modelUpAxis = enModelUpAxis;
 		// 音源データを定数バッファとして設定する
-		//modelInitData.m_expandConstantBuffer = (void*)&g_infoForEdge.GetSoundSourceData();
-		//modelInitData.m_expandConstantBufferSize = sizeof(g_infoForEdge.GetSoundSourceData());
+		modelInitData.m_expandConstantBuffer = (void *)&g_edgeControl.GetSoundSourceData();
+		modelInitData.m_expandConstantBufferSize = sizeof(g_edgeControl.GetSoundSourceData());
 		// 作成した初期化データをもとにモデルを初期化する。
 		m_forwardRenderModel.Init(modelInitData);
 	}
@@ -122,6 +109,28 @@ namespace nsK2EngineLow
 		modelInitData.m_tkmFilePath = filePath;
 		// 初期化データをもとにモデルを初期化
 		m_renderToGBufferModel.Init(modelInitData);
+	}
+	void ModelRender::UpdateInstancingData(const Vector3& pos, const Quaternion& rot, const Vector3& scale)
+	{
+		K2_ASSERT(m_numInstance < m_maxInstance, "インスタンスの数が多すぎです。");
+		if (!m_isEnableInstancingDraw) {
+			return;
+		}
+		auto wlorldMatrix = m_forwardRenderModel.CalcWorldMatrix(pos, rot, scale);
+
+		// インスタンシング描画を行う。
+		m_worldMatrixArray[m_numInstance] = wlorldMatrix;
+		if (m_numInstance == 0) {
+			//インスタンス数が0の場合のみアニメーション関係の更新を行う。
+			// スケルトンを更新。
+			// 各インスタンスのワールド空間への変換は、
+			// インスタンスごとに行う必要があるので、頂点シェーダーで行う。
+			// なので、単位行列を渡して、モデル空間でボーン行列を構築する。
+			m_skeleton.Update(g_matIdentity);
+			//アニメーションを進める。
+			m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);
+		}
+		m_numInstance++;
 	}
 
 	void ModelRender::Update()

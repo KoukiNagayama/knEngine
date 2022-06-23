@@ -52,7 +52,7 @@ namespace nsK2EngineLow
 		);
 
 		// レンダリングターゲットのテクスチャを埋める値 
-		float clearColor[4] = { 3000.0f, 3000.0f, 3000.0f, 1.0f };
+		float clearColor[4] = { 10000.0f, 10000.0f, 10000.0f, 1.0f };
 		// ワールド座標出力用のレンダリングターゲットを初期化する
 		m_gBuffer[enGBufferWorldPos].Create(
 			frameBuffer_w,
@@ -131,28 +131,31 @@ namespace nsK2EngineLow
 		// G-Bufferへのレンダリング
 		RenderToGBuffer(rc);
 
+		// 輪郭線の制御
+		m_edgeControl.Update();
+
 		// フォワードレンダリング
 		ForwardRendering(rc);
 
 		// ブルーム
 		m_bloom.Render(rc, m_mainRenderTarget);
 
-		// 2D描画
-		//Render2D(rc);
+		// スプライト描画
+		RenderSprite(rc);
 
 		// メインレンダリングターゲットの内容をフレームバッファにコピー
 		CopyMainRenderTargetToFrameBuffer(rc);
 
 
-		// 登録されている3Dモデルをクリア
+		// 登録されているオブジェクトをクリア
 		m_renderToGBufferModels.clear();
 		m_forwardRenderModels.clear();
-		//m_sprites.clear();
+		m_sprites.clear();
 	}
 
 	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
 	{
-		RenderTarget* rts[] = {
+		RenderTarget* rts[enGBufferNum] = {
 			&m_gBuffer[enGBufferDepth],			// 0番目のレンダリングターゲット
 			&m_gBuffer[enGBufferNormal],		// 1番目のレンダリングターゲット
 			&m_gBuffer[enGBufferWorldPos]		// 2番目のレンダリングターゲット
@@ -194,7 +197,7 @@ namespace nsK2EngineLow
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 	}
 
-	void RenderingEngine::Render2D(RenderContext& rc)
+	void RenderingEngine::RenderSprite(RenderContext& rc)
 	{
 		// レンダリングターゲットとして利用できるまで待つ
 		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
@@ -246,7 +249,6 @@ namespace nsK2EngineLow
 		rc.SetViewportAndScissor(viewport);
 		m_copyMainRtToFrameBufferSprite.Draw(rc);
 	}
-
 
 	RenderingEngine g_renderingEngine;
 }

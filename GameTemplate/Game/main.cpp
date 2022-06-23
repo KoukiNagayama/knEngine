@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "system/system.h"
 #include "EngineTest.h"
+#include "Game.h"
 
 
 
@@ -13,7 +14,7 @@ K2EngineLow* g_k2EngineLow = nullptr;
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	// ゲームの初期化。
-	InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("Game"));
+	InitGame(hInstance, hPrevInstance, lpCmdLine, nCmdShow, TEXT("BlackNoise"));
 	
 	// k2EngineLowの初期化。
 	g_k2EngineLow = new K2EngineLow();
@@ -27,7 +28,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// レンダリングエンジンを初期化
 	g_renderingEngine.Init();
 
-	auto engineTest = NewGO<EngineTest>(0, "engineTest");
+	//auto engineTest = NewGO<EngineTest>(0, "engineTest");
+	// 
+	// ゲームクラスのインスタンスを生成。
+	auto game = NewGO<Game>(0, "game");
 
 	// ここからゲームループ。
 	while (DispatchWindowMessage())

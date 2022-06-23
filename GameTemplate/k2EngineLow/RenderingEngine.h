@@ -1,5 +1,6 @@
 #pragma once
 #include "Bloom.h"
+#include "EdgeControl.h"
 namespace nsK2EngineLow {
 	class RenderingEngine
 	{
@@ -30,10 +31,10 @@ namespace nsK2EngineLow {
 			m_forwardRenderModels.push_back(&model);
 		}
 		/// <summary>
-		/// 2D描画パスに2Dを追加
+		/// スプライト描画パスにスプライトを追加
 		/// </summary>
 		/// <param name="sprite"></param>
-		void Add2DTo2DRenderPass(Sprite& sprite)
+		void AddSpriteToSpriteRenderPass(Sprite& sprite)
 		{
 			m_sprites.push_back(&sprite);
 		}
@@ -89,10 +90,10 @@ namespace nsK2EngineLow {
 		/// <param name="rc">レンダリングコンテキスト</param>
 		void ForwardRendering(RenderContext& rc);
 		/// <summary>
-		/// 2D描画
+		/// スプライト描画
 		/// </summary>
 		/// <param name="rc"></param>
-		void Render2D(RenderContext& rc);
+		void RenderSprite(RenderContext& rc);
 		/// <summary>
 		/// メインレンダリングターゲットの内容をフレームバッファにコピー
 		/// </summary>
@@ -110,7 +111,8 @@ namespace nsK2EngineLow {
 
 		std::vector<Model*>		m_renderToGBufferModels;				// G-Bufferの描画パスで描画されるモデル
 		std::vector<Model*>		m_forwardRenderModels;					// フォワードレンダリングの描画パスで描画されるモデル
-		std::vector<Sprite*>	m_sprites;								// 描画するスプライト
+		std::vector<Sprite*>	m_sprites;								// スプライトの描画パスで描画するスプライト
+		std::vector<Font*>		m_fonts;								// フォントの描画パスで描画するフォント
 		RenderTarget			m_mainRenderTarget;						// メインレンダリングターゲット
 		RenderTarget			m_gBuffer[enGBufferNum];				// G-Buffer用のレンダリングターゲット
 		RenderTarget			m_2DRenderTarget;						// 2D描画用のレンダリングターゲット
@@ -118,8 +120,9 @@ namespace nsK2EngineLow {
 		Sprite					m_2DSprite;								// 2D合成用スプライト
 		Sprite					m_mainSprite;
 		Bloom					m_bloom;
+		EdgeControl				m_edgeControl;
 	};
 	extern RenderingEngine g_renderingEngine;
 }
-
+ 
 

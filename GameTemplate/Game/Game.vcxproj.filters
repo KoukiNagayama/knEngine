@@ -13,6 +13,13 @@
     </ClCompile>
     <ClCompile Include="EngineTest.cpp" />
     <ClCompile Include="TestCamera.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameCamera.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="Bell.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyPath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -21,5 +28,12 @@
     </ClInclude>
     <ClInclude Include="EngineTest.h" />
     <ClInclude Include="TestCamera.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameCamera.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="BackGround.h" />
+    <ClInclude Include="Bell.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPath.h" />
   </ItemGroup>
 </Project>

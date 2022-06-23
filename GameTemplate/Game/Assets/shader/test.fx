@@ -6,7 +6,7 @@
 // 定数
 ////////////////////////////////////////////////
 // 音源の最大個数
-#define MAX_DATA 100
+#define MAXIMUM_SIZE_OF_SOUND_SOURCE 50
 
 ////////////////////////////////////////////////
 // 構造体
@@ -41,6 +41,17 @@ struct SPSIn
     float3 biNormal : BINORMAL;
 };
 
+// 音源データ
+struct SoundSourceData
+{
+    float3 pos;             // 座標
+    
+    float range;            // 影響範囲
+    float rateByTime;       // 時間経過による影響率
+    float3 pad;
+    int isSound;            // 音源が鳴っているか
+    int3 pad2;
+};
 
 ///////////////////////////////////////////
 // 定数バッファー
@@ -51,6 +62,14 @@ cbuffer ModelCb : register(b0)
     float4x4 mWorld;
     float4x4 mView;
     float4x4 mProj;
+};
+// 音源用の定数バッファー
+cbuffer SoundSourceCb : register(b1)
+{
+    SoundSourceData soundSourceData[MAXIMUM_SIZE_OF_SOUND_SOURCE]; // 音源データ
+    int numSoundSource; // 音源データの個数
+    float sizeOfColorValue; // 色の数値の大きさ
+    
 };
 
 
@@ -149,25 +168,39 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         float2(-1.0f / 1600.0f, -1.0f / 900.0f) //左下
     };
     
-    // 輪郭線を描画するか
-    int drawEdge = 0;
+    // そのピクセルの座標が含まれる影響範囲をもつ音源の数
+    int insideRange = 0;
     // 配列の番号
-    int num = 0;
+    int num = 0;  
+    // 同じピクセルに被っている輪郭線の範囲用配列
+    int edgeArray[5];
     // 色の最大値
     float color = 1.0f;
-    
-    // 同じピクセルに被っている輪郭線の範囲用配列
-    int edgeArray[3];
     // 計算後の色の値の最大値格納用
     float maxColor = 0.0000f;
     
     // ワールド座標
     float3 worldPos = g_worldCoordinateTexture.Sample(g_sampler, uv);
 
-    drawEdge = 1;
+   /* for (int i = 0; i < numSoundSource; i++)
+    {
+        // 音源が鳴っているか時間経過による影響率が残っているならば
+        if(soundSourceData[i].isSound == 1 || soundSourceData[i].rateByTime > 0.00f)
+        {
+            // 音源からの距離
+            float dist = length(worldPos - soundSourceData[i].pos);
+            // 音源からの距離が音源の影響範囲よりも小さいならば
+            if(dist < soundSourceData[i].range)
+            {
+                insideRange++;
+                edgeArray[insideRange - 1] = i;
+            }
+        }
+    }*/
     
+
     // ここから輪郭線描画
-    if (drawEdge == 1)
+    if (insideRange >= 0)
     {
         // 深度値
         // このピクセルの深度値を取得
@@ -195,9 +228,22 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         // 自身の深度値・法線と近傍8テクセルの深度値の差・法線の差を調べる
         if (abs(depth - depth2) > 0.0000455f || length(normal) >= 0.4f)
         {
-           
+          /*  for (int i = 0; i < insideRange; i++)
+            {
+                // 音源からピクセルまでの距離
+                float dist = length(worldPos - soundSourceData[edgeArray[i]].pos);
+                // 距離による影響率
+                float rateByDist = 1.0 - pow((dist / soundSourceData[edgeArray[i]].range), 2.5f);
+                // 輪郭線の色を計算
+                color = 1.0 * soundSourceData[edgeArray[i]].rateByTime * rateByDist;
+                // 計算後の色が一番明るいか
+                if (color > maxColor)
+                {
+                    maxColor = color;
+                }
+            }*/
             // ピクセルを輪郭線として塗りつぶす
-            return float4(1.0f, 1.0f, 1.0f, 1.0f);
+            return float4(0.5f, 0.5f, 0.5f, 1.0f);
         }
 
     }

@@ -1,11 +1,12 @@
 /*!
- * @brief	
+ * @brief 画像描画
  */
 
 cbuffer cb : register(b0){
 	float4x4 mvp;		
 	float4 mulColor;	
 };
+
 struct VSInput{
 	float4 pos : POSITION;
 	float2 uv  : TEXCOORD0;
@@ -16,7 +17,7 @@ struct PSInput{
 	float2 uv  : TEXCOORD0;
 };
 
-Texture2D<float4> colorTexture : register(t0);	//�J���[�e�N�X�`���B
+Texture2D<float4> colorTexture : register(t0);	
 sampler Sampler : register(s0);
 
 PSInput VSMain(VSInput In) 
