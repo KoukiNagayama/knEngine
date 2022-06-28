@@ -1,15 +1,32 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "GameCamera.h"
+#include "sound/SoundEngine.h"
+
 
 namespace
 {
-	const float PLAYER_RADIUS = 50.0f;			// プレイヤーの半径
-	const float PLAYER_HEIGHT = 170.0f;			// プレイヤーの高さ
-	const float WALK_SPEED = 500.0f;			// 歩く速さ
-	const float FRICTION = 0.5f;				// 摩擦
-	const float END_OF_MOVE = 0.001f;			// 1フレームの移動量によって移動終了を表すベクトル
-	const float Y_AXIS_MOVING_AMOUNT = 0.0f;	// Y軸の移動量
+	const float PLAYER_RADIUS = 50.0f;								// プレイヤーの半径
+	const float PLAYER_HEIGHT = 170.0f;								// プレイヤーの高さ
+	const float WALK_SPEED = 500.0f;								// 歩く速さ
+	const float FRICTION = 0.5f;									// 摩擦
+	const float END_OF_MOVE = 0.001f;								// 1フレームの移動量によって移動終了を表すベクトル
+	const float Y_AXIS_MOVING_AMOUNT = 0.0f;						// Y軸の移動量
+	const int	PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER = 1;		// 登録するプレイヤーの足音の番号
+	const float FOOTSTEP_VOLUME = 0.7f;								// 足音の音量
+}
+
+Player::Player()
+{
+
+}
+Player::~Player()
+{
+	if (m_footstepSound != nullptr) {
+		DeleteGO(m_footstepSound);
+	}
+
+	m_charaCon.RemoveRigidBoby();
 }
 
 bool Player::Start()
@@ -18,6 +35,12 @@ bool Player::Start()
 	m_charaCon.Init(PLAYER_RADIUS, PLAYER_HEIGHT, m_position);
 
 	m_gameCamera = FindGO<GameCamera>("gameCamera");
+	
+	g_soundEngine->ResistWaveFileBank(PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER, "Assets/sound/walk.wav");
+
+	m_footstepSound = NewGO<SoundSource>(0);
+	m_footstepSound->Init(PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER);
+	m_footstepSound->SetVolume(FOOTSTEP_VOLUME);
 	return true;
 }
 
@@ -26,10 +49,13 @@ void Player::Update()
 	// 移動
 	Move();
 
+	// 回転
 	Rotation();
 
 	// ステート管理
 	ManageState();
+
+	ProcessByState();
 }
 
 void Player::Move()
@@ -56,8 +82,7 @@ void Player::Move()
 	m_moveSpeed.z -= m_moveSpeed.z * FRICTION;
 
 	// 移動速度が既定値以下だったら
-	if (m_moveSpeed.Length() < END_OF_MOVE)
-	{
+	if (m_moveSpeed.Length() < END_OF_MOVE){
 		// さらに摩擦を付与する。
 		m_moveSpeed.x -= m_moveSpeed.x * FRICTION;
 		m_moveSpeed.z -= m_moveSpeed.z * FRICTION;
@@ -81,16 +106,56 @@ void Player::Rotation()
 	m_rotation.SetRotation(Vector3::AxisY, angle);
 }
 
+void Player::ProcessByState()
+{
+	switch (m_playerState) {
+	case enPlayerState_Idle:
+		StopFootstepSound();
+		break;
+	case enPlayerState_Walk:
+		PlayFootstepSound();
+		break;
+	}
+}
+
 void Player::ManageState()
 {
 	switch (m_playerState) {
 	case enPlayerState_Idle:
+		ProcessCommonStateTransition();
 		break;
 	case enPlayerState_Walk:
+		ProcessCommonStateTransition();
 		break;
 	case enPlayerState_Stop:
 		break;
 	}
+}
+
+void Player::ProcessCommonStateTransition()
+{
+	if (fabsf(m_moveSpeed.x) >= 0.001f || fabsf(m_moveSpeed.z) >= 0.001f)
+	{
+		m_playerState = enPlayerState_Walk;
+	}
+	else {
+		m_playerState = enPlayerState_Idle;
+	}
+
+}
+
+void Player::PlayFootstepSound()
+{
+	// 鳴らす。
+	m_footstepSound->Play(true);
+	m_isFootstepSound = true;
+}
+
+void Player::StopFootstepSound()
+{
+	// 止める。
+	m_footstepSound->Pause();
+	m_isFootstepSound = false;
 }
 
 void Player::Render(RenderContext& rc)

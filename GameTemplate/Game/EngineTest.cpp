@@ -10,7 +10,7 @@ bool EngineTest::Start()
 
 
 	m_pos = { 1.00f,1.00f,1.00f };
-	g_edgeControl.Init(0, m_pos, 10000.0f, 1.0f);
+	g_edgeControl.Init(0, m_pos, 3000.0f, 1.0f);
 	g_edgeControl.SetIsSound(0, 1);
 
 	/*m_unityChan.Init(

@@ -9,11 +9,13 @@ namespace nsK2EngineLow
 		AnimationClip* animationClips,
 		int numAnimationClips,
 		EnModelUpAxis enModelUpAxis,
+		int maxInstance,
 		int outlineType,
-		int maxInstance
+		EdgeControl* edgeControl
 	)
 	{
-		//m_edgeControl = edgeControl;
+		//m_edgeColor = outlineType;
+		m_edgeControl = edgeControl;
 		// スケルトンを初期化。
 		InitSkeleton(filePath);
 		// アニメーションを初期化。
@@ -57,7 +59,12 @@ namespace nsK2EngineLow
 		// tkmファイルのファイルパスを指定する。
 		modelInitData.m_tkmFilePath = filePath;
 		// シェーダーファイルのファイルパスを指定する。
-		modelInitData.m_fxFilePath = "Assets/shader/test.fx";
+		if (outlineType == 0) {
+			modelInitData.m_fxFilePath = "Assets/shader/test.fx";
+		}
+		if (outlineType == 1) {
+			modelInitData.m_fxFilePath = "Assets/shader/enemy.fx";
+		}
 		// エントリーポイントを指定する。
 		if (m_animationClips != nullptr) {
 			//スケルトンを指定する。
@@ -79,8 +86,8 @@ namespace nsK2EngineLow
 		// モデルの上方向を指定する。
 		modelInitData.m_modelUpAxis = enModelUpAxis;
 		// 音源データを定数バッファとして設定する
-		modelInitData.m_expandConstantBuffer = (void *)&g_edgeControl.GetSoundSourceData();
-		modelInitData.m_expandConstantBufferSize = sizeof(g_edgeControl.GetSoundSourceData());
+		modelInitData.m_expandConstantBuffer = (void *)&m_edgeControl->GetSoundSourceData();
+		modelInitData.m_expandConstantBufferSize = sizeof(m_edgeControl->GetSoundSourceData());
 		// 作成した初期化データをもとにモデルを初期化する。
 		m_forwardRenderModel.Init(modelInitData);
 	}

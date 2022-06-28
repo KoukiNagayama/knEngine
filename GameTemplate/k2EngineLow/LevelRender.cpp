@@ -31,6 +31,9 @@ namespace nsK2EngineLow {
 		std::function<bool(LevelObjectData& objData)> hookFunc
 	)
 	{
+		// 配列をクリアする。
+		m_bonelist.clear();
+		m_mapChipRenderPtrs.clear();
 		//tklファイルをロードする。
 		m_tklFile.Load(filePath);
 

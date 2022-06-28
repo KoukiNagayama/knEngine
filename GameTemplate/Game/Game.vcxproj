@@ -225,6 +225,8 @@
   <ItemGroup>
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Bell.cpp" />
+    <ClCompile Include="CollectItem.cpp" />
+    <ClCompile Include="EdgeManagement.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyPath.cpp" />
     <ClCompile Include="EngineTest.cpp" />
@@ -238,11 +240,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Preview|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="system\system.cpp" />
-    <ClCompile Include="TestCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Bell.h" />
+    <ClInclude Include="CollectItem.h" />
+    <ClInclude Include="EdgeManagement.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyPath.h" />
     <ClInclude Include="EngineTest.h" />
@@ -251,7 +254,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
-    <ClInclude Include="TestCamera.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

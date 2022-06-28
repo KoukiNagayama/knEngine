@@ -1,10 +1,13 @@
 #pragma once
+
+#include "sound/SoundSource.h"
+
 class GameCamera;
 class Player : public IGameObject
 {
 public:
-	Player() {};
-	~Player() {};
+	Player();
+	~Player();
 	/// <summary>
 	/// 開始処理。
 	/// </summary>
@@ -49,6 +52,14 @@ public:
 	{
 		return m_rotation;
 	}
+	/// <summary>
+	/// プレイヤーの足音が鳴っているか。
+	/// </summary>
+	/// <returns>鳴っていればtrue。鳴っていなければfalse。</returns>
+	bool IsPlayerFootstepSound() const
+	{
+		return m_isFootstepSound;
+	}
 private:
 	/// <summary>
 	/// 移動処理。
@@ -63,9 +74,21 @@ private:
 	/// </summary>
 	void ManageState();
 	/// <summary>
-	/// ステートによる処理。
+	/// ステートごとの処理。
 	/// </summary>
 	void ProcessByState();
+	/// <summary>
+	/// 共通のステート遷移処理。
+	/// </summary>
+	void ProcessCommonStateTransition();
+	/// <summary>
+	/// 足音を鳴らす。
+	/// </summary>
+	void PlayFootstepSound();
+	/// <summary>
+	/// 足音を止める。
+	/// </summary>
+	void StopFootstepSound();
 
 private:
 	enum EnPlayerState {
@@ -79,6 +102,7 @@ private:
 	Vector3					m_moveSpeed = Vector3::Zero;		// 移動速度
 	CharacterController		m_charaCon;							// キャラクターコントローラー
 	EnPlayerState			m_playerState = enPlayerState_Idle;	// プレイヤーステート
-	
+	SoundSource*			m_footstepSound = nullptr;			// 足音
+	bool					m_isFootstepSound = false;
 };
 

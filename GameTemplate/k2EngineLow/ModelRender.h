@@ -1,6 +1,7 @@
 #pragma once
 #include "EdgeControl.h"
 #include "RenderingEngine.h"
+
 namespace nsK2EngineLow {
 	class ModelRender
 	{
@@ -20,8 +21,9 @@ namespace nsK2EngineLow {
 			AnimationClip* animationClips = nullptr,
 			int numAnimationClips = 0,
 			EnModelUpAxis enModelUpAxis = enModelUpAxisZ,
+			int maxInstance = 0,
 			int outlineType = 0,
-			int maxInstance = 0
+			EdgeControl* edgeControl = nullptr
 		);
 		/// <summary>
 		/// 更新処理
@@ -189,6 +191,7 @@ namespace nsK2EngineLow {
 		bool									m_isEnableInstancingDraw = false;							// インスタンシング描画が有効？
 		std::unique_ptr<Matrix[]>				m_worldMatrixArray;											// ワールド行列の配列。
 		StructuredBuffer						m_worldMatrixArraySB;										// ワールド行列の配列のストラクチャードバッファ。
+		int										m_edgeColor;
 	};
 
 }

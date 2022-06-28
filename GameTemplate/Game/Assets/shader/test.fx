@@ -45,7 +45,6 @@ struct SPSIn
 struct SoundSourceData
 {
     float3 pos;             // 座標
-    
     float range;            // 影響範囲
     float rateByTime;       // 時間経過による影響率
     float3 pad;
@@ -182,7 +181,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
     // ワールド座標
     float3 worldPos = g_worldCoordinateTexture.Sample(g_sampler, uv);
 
-   /* for (int i = 0; i < numSoundSource; i++)
+    for (int i = 0; i < numSoundSource; i++)
     {
         // 音源が鳴っているか時間経過による影響率が残っているならば
         if(soundSourceData[i].isSound == 1 || soundSourceData[i].rateByTime > 0.00f)
@@ -196,11 +195,11 @@ float4 PSMain(SPSIn psIn) : SV_Target0
                 edgeArray[insideRange - 1] = i;
             }
         }
-    }*/
+    }
     
 
     // ここから輪郭線描画
-    if (insideRange >= 0)
+    if (insideRange >= 1)
     {
         // 深度値
         // このピクセルの深度値を取得
@@ -228,7 +227,7 @@ float4 PSMain(SPSIn psIn) : SV_Target0
         // 自身の深度値・法線と近傍8テクセルの深度値の差・法線の差を調べる
         if (abs(depth - depth2) > 0.0000455f || length(normal) >= 0.4f)
         {
-          /*  for (int i = 0; i < insideRange; i++)
+            for (int i = 0; i < insideRange; i++)
             {
                 // 音源からピクセルまでの距離
                 float dist = length(worldPos - soundSourceData[edgeArray[i]].pos);
@@ -241,9 +240,9 @@ float4 PSMain(SPSIn psIn) : SV_Target0
                 {
                     maxColor = color;
                 }
-            }*/
+            }
             // ピクセルを輪郭線として塗りつぶす
-            return float4(0.5f, 0.5f, 0.5f, 1.0f);
+            return float4(maxColor * 0.5f, maxColor * 0.5f, maxColor * 0.5f, 1.0f);
         }
 
     }

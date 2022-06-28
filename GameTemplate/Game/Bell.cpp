@@ -1,11 +1,27 @@
 #include "stdafx.h"
 #include "Bell.h"
 #include "Player.h"
+#include "EdgeManagement.h"
+#include "sound/SoundEngine.h"
+
 
 namespace
 {
 	const float SHIFT_POSITION_FROM_CAMERA = 35.0f;				// カメラからずらす値
 	const float MODEL_POSITION_UP = 25.0f;						// ベルを少し上にあげる
+	const int	EDGE_COLOR_WHITE = 0;							// 輪郭線の色
+	const int	NUM_ANIMATIONCLIP = 0;							// アニメーションクリップの数
+	const int	MAX_INSTANCE = 0;								// インスタンスの最大数
+	const int	BELL_SOUND_NUMBER_TO_REGISTER = 0;				// 登録するベルの音の番号
+	const float VOLUME = 1.0f;									// 音量
+	const float TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC = 3.0f;	// 再度使用可能になる時間
+}
+
+Bell::~Bell()
+{
+	if (m_bellSound != nullptr) {
+		DeleteGO(m_bellSound);
+	}
 }
 
 bool Bell::Start()
@@ -17,11 +33,15 @@ bool Bell::Start()
 	m_bellModel.Init(
 		"Assets/modelData/item/bell.tkm",
 		nullptr,
-		0,
+		NUM_ANIMATIONCLIP,
 		enModelUpAxisZ,
-		0
+		MAX_INSTANCE,
+		EDGE_COLOR_WHITE,
+		m_edgeManagement->GetEdgeControl()
 	);
 
+	// 波形データを登録する。
+	g_soundEngine->ResistWaveFileBank(BELL_SOUND_NUMBER_TO_REGISTER, "Assets/sound/bell_low.wav");
 
 
 	return true;
@@ -30,6 +50,8 @@ bool Bell::Start()
 void Bell::Update()
 {
 	MoveWithPlayer();
+
+	Ring();
 
 	m_bellModel.Update();
 }
@@ -64,6 +86,31 @@ void Bell::MoveWithPlayer()
 	m_bellModel.SetRotation(m_player->GetRotation());
 
 }
+
+void Bell::Ring()
+{
+	// タイマーを減らす。
+	m_availableAgainTimerPerSec -= g_gameTime->GetFrameDeltaTime();
+
+	// Bボタンを押したときにタイマーが0になっていれば
+	if (g_pad[0]->IsTrigger(enButtonB) && m_availableAgainTimerPerSec <= 0.0f) {
+		// 音源を鳴らす。
+		m_bellSound = NewGO<SoundSource>(0);
+		m_bellSound->Init(BELL_SOUND_NUMBER_TO_REGISTER);
+		m_bellSound->SetVolume(VOLUME);
+		m_bellSound->Play(false);
+
+		// 鳴っている。
+		m_isRing = true;
+		// タイマーを再度初期化。
+		m_availableAgainTimerPerSec = TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC;
+		return;
+	}
+
+	// 鳴っていない。
+	m_isRing = false;
+}
+
 
 void Bell::Render(RenderContext& rc)
 {
