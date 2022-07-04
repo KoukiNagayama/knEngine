@@ -21,6 +21,9 @@
     <ClCompile Include="EnemyPath.cpp" />
     <ClCompile Include="EdgeManagement.cpp" />
     <ClCompile Include="CollectItem.cpp" />
+    <ClCompile Include="TitleCamera.cpp" />
+    <ClCompile Include="TitleText.cpp" />
+    <ClCompile Include="GameOver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -37,5 +40,12 @@
     <ClInclude Include="EnemyPath.h" />
     <ClInclude Include="EdgeManagement.h" />
     <ClInclude Include="CollectItem.h" />
+    <ClInclude Include="TitleCamera.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TitleText.h" />
+    <ClInclude Include="GameOver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.rc" />
   </ItemGroup>
 </Project>

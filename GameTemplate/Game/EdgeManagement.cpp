@@ -3,13 +3,17 @@
 #include "Bell.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "TitleCamera.h"
+#include "Game.h"
 namespace
 {
 	const float BELL_RANGE = 2000.0f;					// ベルが輪郭線に影響を与える範囲
 	const float PLAYER_FOOTSTEP_RANGE = 300.0f;			// プレイヤーの足音が輪郭線に影響を与える範囲
 	const float ENEMY_FOOTSTEP_RANGE = 450.0f;			// エネミーの足音が輪郭線に影響を与える範囲
 	const float ENEMY_SCREAM_RANGE = 1300.0f;			// エネミーの咆哮が輪郭線に影響を与える範囲
-	
+	const float TITLE_RANGE = 800.0f;					// タイトルで輪郭線に影響を与える範囲
+	const float TITLE_OUTLINE_RATE = 1.0f;				// タイトルでの輪郭線の影響率
+
 	const int IS_SOUND = 1;								// 音が鳴っている
 	const int IS_NOT_SOUND = 0;							// 音が鳴っていない
 	const float EDGE_FADE_IN_DELTA_VALUE = 0.05f;		// エッジがフェードインするときの変位量
@@ -20,19 +24,21 @@ namespace
 
 void EdgeManagement::Init()
 {
+	m_game = FindGO<Game>("game");
 	// ベルのインスタンスを検索。
 	m_bell = FindGO<Bell>("bell");
 	// プレイヤーのインスタンスを検索。
 	m_player = FindGO<Player>("player");
 	// エネミーのインスタンスを検索。
 	m_enemy = FindGO<Enemy>("enemy");
+	
 
 
 
 	// ベルの輪郭線への影響を初期化。
 	m_edgeControl.Init(
 		enSoundSourceData_Bell,
-		m_bell->GetPosition(),
+		Vector3::Zero,
 		BELL_RANGE,
 		m_rateByTimeOfBell
 	);
@@ -42,7 +48,7 @@ void EdgeManagement::Init()
 	// プレイヤーの足音の輪郭線への影響を初期化。
 	m_edgeControl.Init(
 		enSoundSourceData_PlayerFootstep,
-		m_player->GetPosition(),
+		Vector3::Zero,
 		PLAYER_FOOTSTEP_RANGE,
 		m_rateByTimeOfPlayerFootstep
 	);
@@ -52,7 +58,7 @@ void EdgeManagement::Init()
 	// エネミーの足音の輪郭線への影響を初期化。
 	m_edgeControl.Init(
 		enSoundSourceData_EnemyFootstep,
-		m_enemy->GetPosition(),
+		Vector3::Zero,
 		ENEMY_FOOTSTEP_RANGE,
 		m_rateByTimeOfEnemyFootstep
 	);
@@ -62,11 +68,28 @@ void EdgeManagement::Init()
 	// エネミーの咆哮の輪郭線への影響を初期化。
 	m_edgeControl.Init(
 		enSoundSourceData_EnemyScream,
-		m_enemy->GetPosition(),
+		Vector3::Zero,
 		ENEMY_SCREAM_RANGE,
 		m_rateByTimeOfEnemyScream
 	);
 	m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream, IS_NOT_SOUND);
+
+	// タイトルの時は。
+	if (m_game->IsTitle()) {
+		// タイトルカメラの情報を取得する。
+		m_titleCamera = FindGO<TitleCamera>("titleCamera");
+		// 輪郭線描画の中心をタイトルカメラの座標とする。
+		m_positionOfCenterInTitle = m_titleCamera->GetPosition();
+	}
+
+	// タイトルの時の輪郭線への影響を初期化。
+	m_edgeControl.Init(
+		enSoundSourceData_Title,
+		m_positionOfCenterInTitle,
+		TITLE_RANGE,
+		TITLE_OUTLINE_RATE
+	);
+	m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_NOT_SOUND);
 }
 
 void EdgeManagement::Update()
@@ -74,14 +97,21 @@ void EdgeManagement::Update()
 	if (m_bell == nullptr || m_player == nullptr || m_enemy == nullptr) {
 		return;
 	}
+
+	// 音が鳴っているかを指定。
+	SpecifyIsSound();
+
+	if (m_game->IsInGame() == false) {
+		return;
+	}
+
 	// 座標を指定。
 	SpecifyPosition();
 
 	// 時間による影響率を指定。
 	SpecifyRateByTime();
 
-	// 音が鳴っているかを指定。
-	SpecifyIsSound();
+
 }
 
 void EdgeManagement::Clear()
@@ -107,6 +137,11 @@ void EdgeManagement::SpecifyPosition()
 
 void EdgeManagement::SpecifyIsSound()
 {
+	if (m_game->IsTitle()) {
+		m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_SOUND);
+		return;
+	}
+	
 	// ベル。
 	SpecifyIsBellSounding();
 

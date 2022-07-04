@@ -2,6 +2,7 @@
 class EdgeManagement;
 class Player;
 class Game;
+class Bell;
 class CollectItem : public IGameObject
 {
 public:
@@ -30,6 +31,10 @@ public:
 	{
 		m_edgeManagement = edgeManagement;
 	}
+	const void SetPosition(Vector3 position)
+	{
+		m_position = position;
+	}
 private:
 	/// <summary>
 	/// 回転。
@@ -43,6 +48,14 @@ private:
 	/// 再び出現するまでのカウント。
 	/// </summary>
 	void CountAppearsAgain();
+	/// <summary>
+	/// アイテムを取得する。
+	/// </summary>
+	void RetrieveItem();
+	/// <summary>
+	/// モデルの色を変更するか調べる。
+	/// </summary>
+	void CheckChangeColor();
 private:
 	ModelRender				m_itemModel;							// アイテムのモデル
 	Vector3					m_position = Vector3::Zero;				// 座標
@@ -53,5 +66,10 @@ private:
 	Player*					m_player = nullptr;						// プレイヤー
 	float					m_drawAgainTimerPerSec = 0.0f;			// 再び描画されるようになるまでのタイマー(単位:秒)
 	Game*					m_game = nullptr;						// ゲーム
+	Vector3					m_playerPos = Vector3::Zero;			// プレイヤーの座標
+	Vector3					m_distToPlayer = Vector3::Zero;			// プレイヤーとの距離
+	int						m_currentColor;							// 現在の色
+	Bell*					m_bell = nullptr;						// ベル
+	float					m_resetColorTimerPerSec = 0.0f;			// 色をリセットするタイマー(単位:秒)
 };
 

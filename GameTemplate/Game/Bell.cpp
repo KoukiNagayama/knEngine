@@ -58,7 +58,6 @@ void Bell::Update()
 
 void Bell::MoveWithPlayer()
 {
-	
 	// 上方向ベクトル。
 	Vector3 up;
 	// 右方向ベクトル。

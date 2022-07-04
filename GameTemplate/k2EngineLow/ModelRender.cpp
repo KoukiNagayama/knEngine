@@ -62,8 +62,11 @@ namespace nsK2EngineLow
 		if (outlineType == 0) {
 			modelInitData.m_fxFilePath = "Assets/shader/test.fx";
 		}
-		if (outlineType == 1) {
+		else if (outlineType == 1) {
 			modelInitData.m_fxFilePath = "Assets/shader/enemy.fx";
+		}
+		else if (outlineType == 2) {
+			modelInitData.m_fxFilePath = "Assets/shader/colorChangeOfBell.fx";
 		}
 		// エントリーポイントを指定する。
 		if (m_animationClips != nullptr) {

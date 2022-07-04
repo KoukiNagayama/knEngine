@@ -230,6 +230,39 @@ namespace nsK2EngineLow
 		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 	}
 
+	void RenderingEngine::RenderFont(RenderContext& rc)
+	{
+		// レンダリングターゲットとして利用できるまで待つ
+		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
+
+		// レンダリングターゲットを設定
+		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
+
+		// レンダリングターゲットをクリア
+		rc.ClearRenderTargetView(m_2DRenderTarget);
+
+		m_mainSprite.Draw(rc);
+
+
+
+
+
+
+		// 2D描画用レンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
+
+		// レンダリングターゲットとして利用できるまで待つ
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+
+		// レンダリングターゲットを設定
+		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+
+		m_2DSprite.Draw(rc);
+
+		// メインレンダリングターゲットへの書き込み終了待ち
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+	}
+
 	void RenderingEngine::CopyMainRenderTargetToFrameBuffer(RenderContext& rc)
 	{
 		rc.SetRenderTarget(

@@ -2,6 +2,8 @@
 class Bell;
 class Player;
 class Enemy;
+class TitleCamera;
+class Game;
 class EdgeManagement
 {
 public:
@@ -107,6 +109,7 @@ private:
 		enSoundSourceData_PlayerFootstep,	// プレイヤーの足音
 		enSoundSourceData_EnemyFootstep,	// エネミーの足音
 		enSoundSourceData_EnemyScream,		// エネミーの咆哮
+		enSoundSourceData_Title,			// タイトル
 		enSoundSourceData_Num				// 音の個数
 	};
 
@@ -121,6 +124,7 @@ private:
 	Bell*					m_bell = nullptr;										// ベル
 	Player*					m_player = nullptr;										// プレイヤー
 	Enemy*					m_enemy = nullptr;										// エネミー
+	TitleCamera*			m_titleCamera = nullptr;								// タイトルカメラ
 	float					m_rateByTimeOfBell = 0.0f;								// ベルの時間経過による影響率
 	bool					m_isRateUpOfBell = false;								// ベルの影響率を上げるか
 	bool					m_isLastBellSound = false;								// ベルは直前は鳴っていたか 
@@ -133,5 +137,7 @@ private:
 	float					m_rateByTimeOfEnemyScream = 0.0f;						// エネミーの咆哮の時間経過による影響率
 	bool					m_isRateUpOfEnemyScream = false;						// エネミーの咆哮の影響率を上げるか
 	bool					m_isLastEnemyScream = false;							// エネミーの咆哮は直前は鳴っていたか
+	Vector3					m_positionOfCenterInTitle = Vector3::Zero;				// タイトルの時の中心の座標
+	Game*					m_game = nullptr;										// ゲーム
 };
 

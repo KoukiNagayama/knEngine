@@ -517,10 +517,10 @@ void Enemy::ProcessReturnToPathStateTransition()
 void Enemy::ProcessAttackStateTransition()
 {
 	// ゲームオーバー
-	m_attackingTimer -= 1.0f * g_gameTime->GetFrameDeltaTime();
+	m_attackingTimer -= g_gameTime->GetFrameDeltaTime();
 	if (m_attackingTimer <= 0.0f && m_isCaughtPlayer == false) {
 		m_isCaughtPlayer = true;
-		//m_game->SetGameOver();
+		m_game->SetGameOver();
 	}
 }
 

@@ -3,6 +3,8 @@
 #include "EdgeManagement.h"
 #include "Player.h"
 #include "Game.h"
+#include "Bell.h"
+
 namespace
 {
 	const int NUM_ANIMATIONCLIP = 0;								// アニメーションクリップの数
@@ -13,6 +15,9 @@ namespace
 	const float PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM = 100.0f;	// プレイヤーがアイテムを取得可能な距離
 	const float TIME_TO_DRAW_AGAIN_PER_SEC = 5.0f;					// 再び描画するまでの時間。(単位:秒)
 	const float MINIMUM_TIMER_VALUE = 0.0f;							// タイマーの最低値
+	const int LOW_POINT = 1;										// 低いポイントを取得した時に代入する値。
+	const int HIGH_POINT = 3;										// 高いポイントを取得した時に代入する値。
+	const float COLOR_CHANGE_DISTANCE_TO_PLAYER = 500.0f;			// 色を変更するプレイヤーとの距離
 }
 
 bool CollectItem::Start()
@@ -36,6 +41,12 @@ bool CollectItem::Start()
 	// ゲームのインスタンスを検索。
 	m_game = FindGO<Game>("game");
 
+	// プレイヤーが持つベルのインスタンスを検索。
+	m_bell = FindGO<Bell>("bell");
+
+	// 現在の輪郭線の色が白であることを保持する。
+	m_currentColor = EDGE_COLOR_WHITE;
+
 	return true;
 
 }
@@ -49,11 +60,17 @@ void CollectItem::Update()
 		// 以降の処理を行わない。
 		return;
 	}
-	// プレイヤーとの距離を調べる。
-	CheckDistanceToPlayer();
+	// アイテムを取得。
+	RetrieveItem();
+
+	// 色を変更するか調べる。
+	CheckChangeColor();
 
 	// 回転させる。
 	Rotation();
+
+	// 座標を設定。
+	m_itemModel.SetPosition(m_position);
 
 	// モデルの更新。
 	m_itemModel.Update();
@@ -70,19 +87,90 @@ void CollectItem::Rotation()
 void CollectItem::CheckDistanceToPlayer()
 {
 	// プレイヤーの座標。
-	Vector3 playerPos = m_player->GetPosition();
+	m_playerPos = m_player->GetPosition();
 	// プレイヤーとの距離。
-	Vector3 distToPlayer = m_position - playerPos;
+	m_distToPlayer = m_position - m_playerPos;
+
+}
+
+void CollectItem::RetrieveItem()
+{
+	// プレイヤーとの距離を調べる。
+	CheckDistanceToPlayer();
 
 	// プレイヤーがアイテムを取得するならば。
-	if (distToPlayer.Length() < PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM) {
-		// スコアを増やす。
-		m_game->AddScore(1);
+	if (m_distToPlayer.Length() < PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM) {
+		// 現在の色が白ならば。
+		if (m_currentColor == EDGE_COLOR_WHITE) {
+			// スコアを1増やす。
+			m_game->AddScore(LOW_POINT);
+		}
+		// 現在の色が黄ならば。
+		else if (m_currentColor == EDGE_COLOR_YELLOW) {
+			// スコアを3増やす。
+			m_game->AddScore(HIGH_POINT);
+		}
+
 		// 描画をしないようにする。
 		m_isDraw = false;
 		// 再び描画されるまでのタイマーをリセット。
 		m_drawAgainTimerPerSec = TIME_TO_DRAW_AGAIN_PER_SEC;
 	}
+}
+
+void CollectItem::CheckChangeColor()
+{
+	// プレイヤーとの距離を調べる。
+	CheckDistanceToPlayer();
+
+	// プレイヤーがベルを鳴らしているか。
+	bool isBellRing = m_bell->IsBellRinging();
+
+	// 現在の色が黄ならば色を白に戻すためのタイマーを進める。
+	if (m_currentColor == EDGE_COLOR_YELLOW) {
+		m_resetColorTimerPerSec -= g_gameTime->GetFrameDeltaTime();
+	}
+
+	// プレイヤーがベルを鳴らしている時に距離が近く、現在の色が白ならば。
+	if (m_distToPlayer.Length() < COLOR_CHANGE_DISTANCE_TO_PLAYER 
+		&& m_currentColor == EDGE_COLOR_WHITE
+		&& isBellRing == true
+		) 
+	{
+		// モデルを初期化する。(輪郭線の色は黄)
+		m_itemModel.Init(
+			"Assets/modelData/item/bell.tkm",
+			nullptr,
+			NUM_ANIMATIONCLIP,
+			enModelUpAxisZ,
+			MAX_INSTANCE,
+			EDGE_COLOR_YELLOW,
+			m_edgeManagement->GetEdgeControl()
+		);
+		// 現在の色を保持する。
+		m_currentColor = EDGE_COLOR_YELLOW;
+		// 色をリセットするタイマーを初期化する。
+		m_resetColorTimerPerSec = 5.0f;
+
+	}
+	// プレイヤーとの距離が遠く、現在の色が黄ならば。
+	else if (m_currentColor == EDGE_COLOR_YELLOW
+		&& m_resetColorTimerPerSec <= 0.0f
+		)
+	{
+		// モデルを初期化する。(輪郭線の色は白)
+		m_itemModel.Init(
+			"Assets/modelData/item/bell.tkm",
+			nullptr,
+			NUM_ANIMATIONCLIP,
+			enModelUpAxisZ,
+			MAX_INSTANCE,
+			EDGE_COLOR_WHITE,
+			m_edgeManagement->GetEdgeControl()
+		);
+		m_currentColor = EDGE_COLOR_WHITE;
+	}
+	
 }
 
 void CollectItem::CountAppearsAgain()

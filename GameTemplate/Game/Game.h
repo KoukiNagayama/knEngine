@@ -9,6 +9,9 @@ class BackGround;
 class Bell;
 class Enemy;
 class CollectItem;
+class TitleCamera;
+class TitleText;
+class GameOver;
 
 class Game : public IGameObject
 {
@@ -24,6 +27,15 @@ public:
 	/// 更新処理
 	/// </summary>
 	void Update();
+
+	bool IsTitle()
+	{
+		return m_gameState == enGameState_Title;
+	}
+	bool IsInGame()
+	{
+		return m_gameState == enGameState_InGame;
+	}
 	/// <summary>
 	/// ゲームクリアしているか。
 	/// </summary>
@@ -84,6 +96,14 @@ private:
 	/// インゲームのオブジェクトを削除
 	/// </summary>
 	void DeleteInGameObject();
+	/// <summary>
+	/// タイトルのオブジェクトを削除
+	/// </summary>
+	void DeleteTitleObject();
+	/// <summary>
+	/// ゲームの残り時間の処理
+	/// </summary>
+	void GameTimer();
 private:
 	enum EnGameState
 	{
@@ -108,5 +128,11 @@ private:
 	int					m_score = 0;							// プレイヤーのスコア
 	int					m_highScore = 0;						// プレイヤーのハイスコア
 	CollectItem*		m_collectItem = nullptr;				// 収集アイテム					
+	float				m_remainingTime = 0.0f;					// 残り時間
+	LevelRender			m_titleLevel;							// タイトルのレベル
+	TitleCamera*		m_titleCamera = nullptr;				// タイトルカメラクラス
+	TitleText*			m_titleText = nullptr;					// タイトルテキストクラス
+	CollectItem* m_collectItem2 = nullptr;
+	GameOver* m_gameOver = nullptr;
 };
 
