@@ -25,7 +25,11 @@
     <ClCompile Include="TitleText.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="TitleSprite.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="Score.cpp" />
+=======
+    <ClCompile Include="GameTimeScreen.cpp" />
+>>>>>>> 039b93a59b3e61c5e16b98dadcf9155deaddc027
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -47,7 +51,11 @@
     <ClInclude Include="TitleText.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="TitleSprite.h" />
+<<<<<<< HEAD
     <ClInclude Include="Score.h" />
+=======
+    <ClInclude Include="GameTimeScreen.h" />
+>>>>>>> 039b93a59b3e61c5e16b98dadcf9155deaddc027
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
