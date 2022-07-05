@@ -133,7 +133,6 @@ private:
 	LevelRender			m_titleLevel;							// タイトルのレベル
 	TitleCamera*		m_titleCamera = nullptr;				// タイトルカメラクラス
 	TitleText*			m_titleText = nullptr;					// タイトルテキストクラス
-	CollectItem* m_collectItem2 = nullptr;
 	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
 	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
 };

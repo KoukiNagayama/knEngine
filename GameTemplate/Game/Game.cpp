@@ -239,9 +239,6 @@ void Game::InitInGame()
  
 	m_collectItem = NewGO<CollectItem>(0, "collectItem");
 	m_collectItem->SetEdgeManagement(&m_edgeManagement);
-	m_collectItem2 = NewGO<CollectItem>(0, "collectItem");
-	m_collectItem2->SetEdgeManagement(&m_edgeManagement);
-	m_collectItem2->SetPosition({ 100.0f,10.0f,0.0f });
 	m_edgeManagement.Init();
 }
 

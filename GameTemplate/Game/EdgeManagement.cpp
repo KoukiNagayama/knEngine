@@ -13,6 +13,7 @@ namespace
 	const float ENEMY_SCREAM_RANGE = 1300.0f;			// エネミーの咆哮が輪郭線に影響を与える範囲
 	const float TITLE_RANGE = 800.0f;					// タイトルで輪郭線に影響を与える範囲
 	const float TITLE_OUTLINE_RATE = 1.0f;				// タイトルでの輪郭線の影響率
+	const float NO_TITLE_OUTLINE_RATE = 0.0f;			// タイトルでの輪郭線の影響率なし
 
 	const int IS_SOUND = 1;								// 音が鳴っている
 	const int IS_NOT_SOUND = 0;							// 音が鳴っていない
@@ -137,10 +138,13 @@ void EdgeManagement::SpecifyPosition()
 
 void EdgeManagement::SpecifyIsSound()
 {
+	// タイトル。
 	if (m_game->IsTitle()) {
 		m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_SOUND);
 		return;
 	}
+
+	m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_NOT_SOUND);
 	
 	// ベル。
 	SpecifyIsBellSounding();
@@ -153,6 +157,8 @@ void EdgeManagement::SpecifyIsSound()
 
 	// エネミーの咆哮。
 	SpecifyIsEnemyScreamSounding();
+
+	
 }
 
 void EdgeManagement::SpecifyIsBellSounding()
@@ -220,6 +226,8 @@ void EdgeManagement::SpecifyRateByTime()
 	CalcRateOfEnemyFootstep();
 	// エネミーの咆哮。
 	CalcRateOfEnemyScream();
+	// タイトル。
+	m_edgeControl.SetRate(enSoundSourceData_Title, NO_TITLE_OUTLINE_RATE);
 }
 
 void EdgeManagement::CalcRateOfBell()
