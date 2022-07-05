@@ -10,6 +10,7 @@
 #include "TitleText.h"
 #include "GameOver.h"
 #include "TitleSprite.h"
+#include "GameTimeScreen.h"
 
 namespace
 {
@@ -50,6 +51,11 @@ bool Game::Start()
 
 	// 輪郭線情報を初期化。
 	m_edgeManagement.Init();
+
+	// 残り時間を表示するオブジェクトを作成（前面に出すため描画順番遅め）
+	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
+	// 無を描画しないように初期化
+	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
 
 	return true;
 }
@@ -324,5 +330,8 @@ void Game::GameTimer()
 	// 残り時間を計算。
 	m_remainingTime -= g_gameTime->GetFrameDeltaTime();
 	
+	// 残り時間を渡す
+	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+
 }
 

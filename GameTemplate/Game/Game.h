@@ -13,6 +13,7 @@ class TitleCamera;
 class TitleText;
 class GameOver;
 class TitleSprite;
+class GameTimeScreen;
 
 class Game : public IGameObject
 {
@@ -136,5 +137,7 @@ private:
 	CollectItem* m_collectItem2 = nullptr;
 	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
 	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
+	GameTimeScreen* m_gameTimeScreen = nullptr;					// 残り時間表示クラス
+
 };
 
