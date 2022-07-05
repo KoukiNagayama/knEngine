@@ -12,6 +12,7 @@ class CollectItem;
 class TitleCamera;
 class TitleText;
 class GameOver;
+class TitleSprite;
 
 class Game : public IGameObject
 {
@@ -133,6 +134,7 @@ private:
 	TitleCamera*		m_titleCamera = nullptr;				// タイトルカメラクラス
 	TitleText*			m_titleText = nullptr;					// タイトルテキストクラス
 	CollectItem* m_collectItem2 = nullptr;
-	GameOver* m_gameOver = nullptr;
+	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
+	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
 };
 

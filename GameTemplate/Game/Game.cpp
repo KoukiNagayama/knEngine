@@ -9,6 +9,7 @@
 #include "TitleCamera.h"
 #include "TitleText.h"
 #include "GameOver.h"
+#include "TitleSprite.h"
 
 namespace
 {
@@ -45,6 +46,7 @@ bool Game::Start()
 				return true;
 			}
 		});
+	m_titleSprite = NewGO<TitleSprite>(0, "titleSprite");
 
 	// ó÷äsê¸èÓïÒÇèâä˙âªÅB
 	m_edgeManagement.Init();
@@ -237,7 +239,7 @@ void Game::InitInGame()
  
 	m_collectItem = NewGO<CollectItem>(0, "collectItem");
 	m_collectItem->SetEdgeManagement(&m_edgeManagement);
-	m_collectItem2 = NewGO<CollectItem>(0, "collectItem2");
+	m_collectItem2 = NewGO<CollectItem>(0, "collectItem");
 	m_collectItem2->SetEdgeManagement(&m_edgeManagement);
 	m_collectItem2->SetPosition({ 100.0f,10.0f,0.0f });
 	m_edgeManagement.Init();
@@ -257,6 +259,13 @@ void Game::DeleteInGameObject()
 	for (int i = 0; i < gameCameraSize; i++) {
 		m_gameCamera = gameCameras[i];
 		DeleteGO(m_gameCamera);
+	}
+
+	auto& collectItems = FindGOs<CollectItem>("collectItem");
+	int collectItemSize = collectItems.size();
+	for (int i = 0; i < collectItemSize; i++) {
+		m_collectItem = collectItems[i];
+		DeleteGO(m_collectItem);
 	}
 
 	auto& bells = FindGOs<Bell>("bell");
@@ -280,12 +289,7 @@ void Game::DeleteInGameObject()
 		DeleteGO(m_inGameStage);
 	}
 
-	auto& collectItems = FindGOs<CollectItem>("collectItem");
-	int collectItemSize = collectItems.size();
-	for (int i = 0; i < collectItemSize; i++) {
-		m_collectItem = collectItems[i];
-		DeleteGO(m_collectItem);
-	}
+
 }
 
 void Game::DeleteTitleObject()
@@ -310,6 +314,8 @@ void Game::DeleteTitleObject()
 		m_inGameStage = inGameStages[i];
 		DeleteGO(m_inGameStage);
 	}
+	
+	DeleteGO(m_titleSprite);
 }
 
 void Game::GameTimer()

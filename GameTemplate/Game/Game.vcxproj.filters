@@ -24,6 +24,7 @@
     <ClCompile Include="TitleCamera.cpp" />
     <ClCompile Include="TitleText.cpp" />
     <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="TitleSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -44,6 +45,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="TitleText.h" />
     <ClInclude Include="GameOver.h" />
+    <ClInclude Include="TitleSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

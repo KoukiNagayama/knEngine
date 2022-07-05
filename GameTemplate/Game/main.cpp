@@ -28,8 +28,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// レンダリングエンジンを初期化
 	g_renderingEngine.Init();
 
-	//auto engineTest = NewGO<EngineTest>(0, "engineTest");
-	// 
 	// ゲームクラスのインスタンスを生成。
 	auto game = NewGO<Game>(0, "game");
 

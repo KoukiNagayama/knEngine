@@ -242,6 +242,7 @@
     </ClCompile>
     <ClCompile Include="system\system.cpp" />
     <ClCompile Include="TitleCamera.cpp" />
+    <ClCompile Include="TitleSprite.cpp" />
     <ClCompile Include="TitleText.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -260,6 +261,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
     <ClInclude Include="TitleCamera.h" />
+    <ClInclude Include="TitleSprite.h" />
     <ClInclude Include="TitleText.h" />
   </ItemGroup>
   <ItemGroup>

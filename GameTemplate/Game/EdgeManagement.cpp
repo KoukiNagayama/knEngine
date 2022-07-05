@@ -17,7 +17,7 @@ namespace
 	const int IS_SOUND = 1;								// 音が鳴っている
 	const int IS_NOT_SOUND = 0;							// 音が鳴っていない
 	const float EDGE_FADE_IN_DELTA_VALUE = 0.05f;		// エッジがフェードインするときの変位量
-	const float EDGE_FADE_OUT_DELTA_VALUE = 0.00f;	// エッジがフェードアウトするときの変位量
+	const float EDGE_FADE_OUT_DELTA_VALUE = 0.0065f;	// エッジがフェードアウトするときの変位量
 	const float RATE_BY_TIME_MAX_VALUE = 1.00f;			// 時間による影響率の最大値
 	const float RATE_BY_TIME_MIN_VALUE = 0.00f;			// 時間による影響率の最小値
 }
