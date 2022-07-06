@@ -338,7 +338,7 @@ void Game::GameTimer()
 	m_remainingTime -= g_gameTime->GetFrameDeltaTime();
 	
 	// Žc‚èŽžŠÔ‚ð“n‚·
-	//m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
 
 }
 
