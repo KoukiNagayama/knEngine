@@ -13,6 +13,7 @@
 #include "GameTimeScreen.h"
 #include "GameOverEffect.h"
 #include "Score.h"
+#include "Result.h"
 
 namespace
 {
@@ -23,36 +24,7 @@ namespace
 
 bool Game::Start()
 {
-	// 時間を設定。
-	m_remainingTime = SETTING_TIME_3_MIN_PER_FRAME;
-
-	m_titleLevel.Init("Assets/level3D/title.tkl", [&](LevelObjectData& objData)
-		{
-			// タイトルモデル
-			if (objData.EqualObjectName(L"titleText") == true) {
-				m_titleText = NewGO<TitleText>(0, "titleText");
-				m_titleText->SetPosition(objData.position);
-				m_titleText->SetEdgeManagement(&m_edgeManagement);
-				return true;
-			}
-			// タイトル用カメラ
-			if (objData.EqualObjectName(L"titleCamera") == true) {
-				m_titleCamera = NewGO<TitleCamera>(0, "titleCamera");
-				m_titleCamera->SetPosition(objData.position);
-				return true;
-			}
-			// 背景
-			if (objData.EqualObjectName(L"stage2") == true) {
-				m_inGameStage = NewGO<BackGround>(0, "backGround");
-				m_inGameStage->SetPosition(objData.position);
-				m_inGameStage->SetEdgeManagement(&m_edgeManagement);
-				return true;
-			}
-		});
-	m_titleSprite = NewGO<TitleSprite>(0, "titleSprite");
-
-	// 輪郭線情報を初期化。
-	m_edgeManagement.Init();
+	StartTitle();
 
 	// 残り時間を表示するオブジェクトを作成（前面に出すため描画順番遅め）
 	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
@@ -136,6 +108,11 @@ void Game::StateTransitionProccesingFromInGame()
 		m_gameState = enGameState_GameEnd;
 		// ゲームオブジェクトを全部削除する。
 		DeleteInGameObject();
+		// タイマーの描画を停止する。
+		m_gameTimeScreen->SetDrawFlag(false);
+		// リザルトを作成。
+		m_result = NewGO<Result>(0, "result");
+		m_result->Init(m_highScore);
 	}
 
 	// ゲームオーバーになっていれば。
@@ -150,7 +127,6 @@ void Game::StateTransitionProccesingFromInGame()
 
 void Game::StateTransitionProccesingFromGameOver()
 {
-
 	m_gameOver = FindGO<GameOver>("gameOver");
 	// ゲームオーバー条件を解除する。
 	m_isGameOver = false;
@@ -174,9 +150,7 @@ void Game::StateTransitionProccesingFromGameOver()
 		DeleteGO(m_gameOver);
 		// インゲームを初期化する。
 		InitInGame();
-	}
-
-	
+	}	
 }
 
 void Game::StateTransitionProccesingFromGameEnd()
@@ -189,8 +163,18 @@ void Game::StateTransitionProccesingFromGameEnd()
 
 	// リザルトの表示が終了しているならば
 	if (m_isResultDisplayFinished) {
+		// リザルトを削除。
+		DeleteGO(m_result);
 		// ゲームステートをタイトルに変更する。
 		m_gameState = enGameState_Title;
+		// タイトル準備。
+		StartTitle();
+		// タイマーの描画を再開する。
+		m_gameTimeScreen->SetDrawFlag(true);
+		// 残り時間を渡す
+		m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+		// リセットしておく
+		m_isResultDisplayFinished = false;
 	}
 }
 
@@ -356,4 +340,38 @@ void Game::GameTimer()
 
 void Game::StartGameOverEffect() {
 	m_gameOverEffect->StartGameOverEffect();
+}
+
+void Game::StartTitle() {
+
+	// 時間を設定。
+	m_remainingTime = SETTING_TIME_3_MIN_PER_FRAME;
+
+	m_titleLevel.Init("Assets/level3D/title.tkl", [&](LevelObjectData& objData)
+		{
+			// タイトルモデル
+			if (objData.EqualObjectName(L"titleText") == true) {
+				m_titleText = NewGO<TitleText>(0, "titleText");
+				m_titleText->SetPosition(objData.position);
+				m_titleText->SetEdgeManagement(&m_edgeManagement);
+				return true;
+			}
+			// タイトル用カメラ
+			if (objData.EqualObjectName(L"titleCamera") == true) {
+				m_titleCamera = NewGO<TitleCamera>(0, "titleCamera");
+				m_titleCamera->SetPosition(objData.position);
+				return true;
+			}
+			// 背景
+			if (objData.EqualObjectName(L"stage2") == true) {
+				m_inGameStage = NewGO<BackGround>(0, "backGround");
+				m_inGameStage->SetPosition(objData.position);
+				m_inGameStage->SetEdgeManagement(&m_edgeManagement);
+				return true;
+			}
+		});
+	m_titleSprite = NewGO<TitleSprite>(0, "titleSprite");
+
+	// 輪郭線情報を初期化。
+	m_edgeManagement.Init();
 }

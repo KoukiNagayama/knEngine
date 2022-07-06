@@ -9,7 +9,7 @@ namespace
 	const float   GAME_OVER_SPRITE_H = 1080.0f;				// スプライトの縦幅。
 	const float	  FADE_IN_ALPHA_MULTIPLIER = 0.5f;			// フェードインのαの倍率。
 	const float   FADE_OUT_ALPHA_MULTIPLIER = 0.4f;			// フェードアウトのαの倍率。
-	const float   FADE_OUT_TIMER_MAX_VALUE_PER_SEC = 1.5f;	// フェードアウトに移行するタイマーの初期化用最大時間
+	const float   FADE_OUT_TIMER_MAX_VALUE_PER_SEC = 2.2f;	// フェードアウトに移行するタイマーの初期化用最大時間
 	const float	  MAX_ALPHA_VALUE = 1.0f;
 	const float   MIN_ALPHA_VALUE = 0.0f;
 
@@ -32,7 +32,7 @@ namespace
 		{0.0f,0.0f,0.0f}
 	};
 
-	const float   BLOOD_START_TIME = 0.6f;	// 血飛沫が出始める時間
+	const float   BLOOD_START_TIME = 1.2f;	// 血飛沫が出始める時間
 	const float   BLOOD_WAIT_TIME = 0.06f;	// 血飛沫の更新時間
 
 }

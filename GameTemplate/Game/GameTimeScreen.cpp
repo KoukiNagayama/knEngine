@@ -100,6 +100,10 @@ void GameTimeScreen::GameTimerUpdate(const float time) {
 
 void GameTimeScreen::Render(RenderContext& rc) {
 
+	if (m_drawFlag == false) {
+		return;
+	}
+
 	for (int i = 0; i < m_numberNum; i++) {
 		m_numberSprite[i].Draw(rc);
 	}

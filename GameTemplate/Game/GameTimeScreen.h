@@ -26,6 +26,14 @@ public:
 	/// <param name="time">表示する時間</param>
 	void GameTimerUpdate(const float time);
 
+	/// <summary>
+	/// 描画フラグを設定
+	/// </summary>
+	/// <param name="flag">フラグ</param>
+	void SetDrawFlag(const bool flag) {
+		m_drawFlag = flag;
+	}
+
 private:
 	
 	SpriteRender m_numberSprite[3];		// 数字画像
@@ -33,7 +41,9 @@ private:
 
 	bool m_colorChangeFlag = false;		// 色変更フラグ
 
-	int m_oldTime = -1;
+	int m_oldTime = -1;					// 旧時間
+
+	bool m_drawFlag = true;				// 描画フラグ
 
 };
 

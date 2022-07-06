@@ -21,6 +21,7 @@
     <ClCompile Include="TitleSprite.cpp" />
     <ClCompile Include="TitleText.cpp" />
     <ClCompile Include="GameOverEffect.cpp" />
+    <ClCompile Include="Result.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="TitleSprite.h" />
     <ClInclude Include="TitleText.h" />
     <ClInclude Include="GameOverEffect.h" />
+    <ClInclude Include="Result.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

@@ -16,6 +16,7 @@ class TitleSprite;
 class GameTimeScreen;
 class GameOverEffect;
 class Score;
+class Result;
 
 class Game : public IGameObject
 {
@@ -114,6 +115,10 @@ private:
 	/// </summary>
 	void StateTransitionProccesingFromGameOver();
 	/// <summary>
+	/// タイトル部分を作成
+	/// </summary>
+	void StartTitle();
+	/// <summary>
 	/// インゲームを初期化
 	/// </summary>
 	void InitInGame();
@@ -129,6 +134,7 @@ private:
 	/// ゲームの残り時間の処理
 	/// </summary>
 	void GameTimer();
+
 private:
 	enum EnGameState
 	{
@@ -160,7 +166,8 @@ private:
 	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
 	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
 	GameTimeScreen*		m_gameTimeScreen = nullptr;				// 残り時間表示クラス
-	GameOverEffect* m_gameOverEffect = nullptr;					// ゲームオーバーエフェクト
+	GameOverEffect*		m_gameOverEffect = nullptr;				// ゲームオーバーエフェクト
 	Score*				m_scoreScreen = nullptr;				// スコア表示クラス
+	Result*				m_result = nullptr;						// リザルトクラス
 };
 
