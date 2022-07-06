@@ -60,6 +60,13 @@ public:
 	{
 		return m_isFootstepSound;
 	}
+	/// <summary>
+	/// 移動可能フラグを設定
+	/// </summary>
+	/// <param name="movable">移動可能かどうか</param>
+	void SetIsMovable(const bool movable) {
+		m_isMovable = movable;
+	}
 private:
 	/// <summary>
 	/// 移動処理。
@@ -104,5 +111,6 @@ private:
 	EnPlayerState			m_playerState = enPlayerState_Idle;	// プレイヤーステート
 	SoundSource*			m_footstepSound = nullptr;			// 足音
 	bool					m_isFootstepSound = false;
+	bool					m_isMovable = true;				// 移動が可能か？
 };
 

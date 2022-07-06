@@ -1,61 +1,48 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="system">
-      <UniqueIdentifier>{22dd8095-74f9-46df-81a1-36675a040b1f}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="system\system.cpp">
-      <Filter>system</Filter>
-    </ClCompile>
+    <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="Bell.cpp" />
+    <ClCompile Include="CollectItem.cpp" />
+    <ClCompile Include="EdgeManagement.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyPath.cpp" />
     <ClCompile Include="EngineTest.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="BackGround.cpp" />
-    <ClCompile Include="Bell.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyPath.cpp" />
-    <ClCompile Include="EdgeManagement.cpp" />
-    <ClCompile Include="CollectItem.cpp" />
-    <ClCompile Include="TitleCamera.cpp" />
-    <ClCompile Include="TitleText.cpp" />
     <ClCompile Include="GameOver.cpp" />
-    <ClCompile Include="TitleSprite.cpp" />
-<<<<<<< HEAD
-    <ClCompile Include="Score.cpp" />
-=======
     <ClCompile Include="GameTimeScreen.cpp" />
->>>>>>> 039b93a59b3e61c5e16b98dadcf9155deaddc027
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Score.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="system\system.cpp" />
+    <ClCompile Include="TitleCamera.cpp" />
+    <ClCompile Include="TitleSprite.cpp" />
+    <ClCompile Include="TitleText.cpp" />
+    <ClCompile Include="GameOverEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="system\system.h">
-      <Filter>system</Filter>
-    </ClInclude>
+    <ClInclude Include="BackGround.h" />
+    <ClInclude Include="Bell.h" />
+    <ClInclude Include="CollectItem.h" />
+    <ClInclude Include="EdgeManagement.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyPath.h" />
     <ClInclude Include="EngineTest.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="BackGround.h" />
-    <ClInclude Include="Bell.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyPath.h" />
-    <ClInclude Include="EdgeManagement.h" />
-    <ClInclude Include="CollectItem.h" />
-    <ClInclude Include="TitleCamera.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="TitleText.h" />
     <ClInclude Include="GameOver.h" />
-    <ClInclude Include="TitleSprite.h" />
-<<<<<<< HEAD
-    <ClInclude Include="Score.h" />
-=======
     <ClInclude Include="GameTimeScreen.h" />
->>>>>>> 039b93a59b3e61c5e16b98dadcf9155deaddc027
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Score.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="system\system.h" />
+    <ClInclude Include="TitleCamera.h" />
+    <ClInclude Include="TitleSprite.h" />
+    <ClInclude Include="TitleText.h" />
+    <ClInclude Include="GameOverEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
