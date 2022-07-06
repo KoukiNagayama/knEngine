@@ -14,6 +14,7 @@ class TitleText;
 class GameOver;
 class TitleSprite;
 class GameTimeScreen;
+class GameOverEffect;
 class Score;
 
 class Game : public IGameObject
@@ -62,6 +63,11 @@ public:
 	{
 		m_isGameOver = true;
 	}
+	/// <summary>
+	/// ゲームオーバーエフェクト開始。
+	/// プレイヤーの移動やカメラの回転を禁止する。
+	/// </summary>
+	void StartGameOverEffect();
 	/// <summary>
 	/// スコアを増やす。
 	/// </summary>
@@ -154,6 +160,7 @@ private:
 	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
 	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
 	GameTimeScreen*		m_gameTimeScreen = nullptr;				// 残り時間表示クラス
+	GameOverEffect* m_gameOverEffect = nullptr;					// ゲームオーバーエフェクト
 	Score*				m_scoreScreen = nullptr;				// スコア表示クラス
 };
 

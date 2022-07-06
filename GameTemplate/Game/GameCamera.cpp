@@ -38,6 +38,11 @@ bool GameCamera::Start()
 
 void GameCamera::Update()
 {
+	// ˆÚ“®•s”\‚È‚ç‘S‚Ä‚Ìˆ—‚ğ’†’f‚·‚é
+	if (m_isMovable == false) {
+		return;
+	}
+
 	// ˆÚ“®
 	Move();
 

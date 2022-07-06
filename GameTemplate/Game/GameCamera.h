@@ -40,6 +40,13 @@ public:
 	{
 		return m_toCameraPos;
 	}
+	/// <summary>
+	/// 移動可能フラグを設定
+	/// </summary>
+	/// <param name="movable">移動可能かどうか</param>
+	void SetIsMovable(const bool movable) {
+		m_isMovable = movable;
+	}
 private:
 	/// <summary>
 	/// 移動処理。
@@ -60,5 +67,7 @@ private:
 	Quaternion		m_rotation = Quaternion::Identity;	// カメラの回転
 	//bool			m_isTargetInRange = true;			// 注視点がカメラの回転の範囲内であるならば
 	Vector3			m_target = Vector3::Zero;			// 注視点
+	bool			m_isMovable = true;			// 移動が可能か？
+
 };	
 

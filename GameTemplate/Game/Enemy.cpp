@@ -438,6 +438,8 @@ void Enemy::ProcessChaseStateTransition()
 	// プレイヤーを攻撃可能な距離ならば
 	if (m_isAttackable == true) {
 		m_enemyState = enEnemyState_Attack;
+		// ゲームオーバーエフェクトの開始
+		m_game->StartGameOverEffect();
 		m_isMove = false;
 		return;
 	}

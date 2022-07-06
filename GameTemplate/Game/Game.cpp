@@ -11,6 +11,7 @@
 #include "GameOver.h"
 #include "TitleSprite.h"
 #include "GameTimeScreen.h"
+#include "GameOverEffect.h"
 #include "Score.h"
 
 namespace
@@ -57,6 +58,9 @@ bool Game::Start()
 	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
 	// 無を描画しないように初期化
 	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+
+	// ゲームオーバーエフェクトを作成
+	m_gameOverEffect = new GameOverEffect;
 
 	m_scoreScreen = NewGO<Score>(11, "score");
 
@@ -121,6 +125,10 @@ void Game::StateTransitionProccesingFromTitle()
 
 void Game::StateTransitionProccesingFromInGame()
 {
+	// ゲームオーバーエフェクト中なら実行処理
+	if (m_gameOverEffect->IsPlayEffect()) {
+		m_gameOverEffect->PlayGameOverEffect();
+	}
 
 	// 残り時間が無いならば。
 	if (m_remainingTime <= GAME_END_TIME_PER_FRAME) {
@@ -256,6 +264,10 @@ void Game::InitInGame()
 	m_collectItem = NewGO<CollectItem>(0, "collectItem");
 	m_collectItem->SetEdgeManagement(&m_edgeManagement);
 	m_edgeManagement.Init();
+
+	// ゲームオーバーエフェクトの初期化
+	m_gameOverEffect->Init(m_player, m_enemy, m_gameCamera);
+
 }
 
 void Game::DeleteInGameObject()
@@ -342,3 +354,6 @@ void Game::GameTimer()
 
 }
 
+void Game::StartGameOverEffect() {
+	m_gameOverEffect->StartGameOverEffect();
+}
