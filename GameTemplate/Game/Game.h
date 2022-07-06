@@ -14,6 +14,7 @@ class TitleText;
 class GameOver;
 class TitleSprite;
 class GameTimeScreen;
+class Score;
 
 class Game : public IGameObject
 {
@@ -68,6 +69,22 @@ public:
 	void AddScore(int score)
 	{
 		m_score += score;
+	}
+	/// <summary>
+	/// スコアを取得。
+	/// </summary>
+	/// <returns>スコア。</returns>
+	int GetScore()
+	{
+		return m_score;
+	}
+	/// <summary>
+	/// ハイスコアを取得。
+	/// </summary>
+	/// <returns>ハイスコア。</returns>
+	int GetHighScore()
+	{
+		return m_highScore;
 	}
 private:
 	/// <summary>
@@ -136,7 +153,7 @@ private:
 	TitleText*			m_titleText = nullptr;					// タイトルテキストクラス
 	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
 	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
-	GameTimeScreen* m_gameTimeScreen = nullptr;					// 残り時間表示クラス
-
+	GameTimeScreen*		m_gameTimeScreen = nullptr;				// 残り時間表示クラス
+	Score*				m_scoreScreen = nullptr;				// スコア表示クラス
 };
 

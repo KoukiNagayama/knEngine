@@ -11,6 +11,7 @@
 #include "GameOver.h"
 #include "TitleSprite.h"
 #include "GameTimeScreen.h"
+#include "Score.h"
 
 namespace
 {
@@ -56,6 +57,11 @@ bool Game::Start()
 	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
 	// 無を描画しないように初期化
 	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+
+	m_scoreScreen = NewGO<Score>(11, "score");
+
+	m_scoreScreen->ScoreUpdate();
+	m_scoreScreen->HighScoreUpdate();
 
 	return true;
 }
@@ -108,6 +114,8 @@ void Game::StateTransitionProccesingFromTitle()
 		m_gameState = enGameState_InGame;
 		// インゲームを初期化する。
 		InitInGame();
+
+
 	}
 }
 
@@ -140,13 +148,15 @@ void Game::StateTransitionProccesingFromGameOver()
 	m_isGameOver = false;
 	// 輪郭線制御の登録データをクリアする。
 	m_edgeManagement.Clear();
+
 	// 今回のスコアがハイスコアより高ければ。
 	if (m_score > m_highScore) {
 		// ハイスコアを更新する。
 		m_highScore = m_score;
-		// スコアを初期化する。
-		m_score = 0;
 	}
+
+	// スコアを初期化する。
+	m_score = 0;
 	
 	// ゲームオーバー時の処理が終了しているならば
 	if (m_gameOver->IsEndProcess()) {
@@ -328,7 +338,7 @@ void Game::GameTimer()
 	m_remainingTime -= g_gameTime->GetFrameDeltaTime();
 	
 	// 残り時間を渡す
-	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+	//m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
 
 }
 

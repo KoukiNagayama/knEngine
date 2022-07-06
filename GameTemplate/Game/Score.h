@@ -1,14 +1,11 @@
 #pragma once
+class Game;
 class Score : public IGameObject
 {
 public:
-	Score() {};
+	Score() ;
 	~Score() {};
-	/// <summary>
-	/// 開始処理。
-	/// </summary>
-	/// <returns></returns>
-	bool Start();
+
 	/// <summary>
 	/// 更新処理。
 	/// </summary>
@@ -17,27 +14,28 @@ public:
 	/// 描画処理。
 	/// </summary>
 	/// <param name="rc"></param>
-	void Render(RenderContext& rc);
+	void Render(RenderContext& rc); 
+	/// <summary>
+	/// 表示されるスコアの更新。
+	/// </summary>
+	void ScoreUpdate();
+	/// <summary>
+	/// 表示されるハイスコアの更新。
+	/// </summary>
+	void HighScoreUpdate();
 private:
-	/// <summary>
-	/// 1の位を求める。
-	/// </summary>
-	void FindToOnesPlace();
-	/// <summary>
-	/// 10の位を求める。
-	/// </summary>
-	void FindToTensPlace();
-	/// <summary>
-	/// 100の位を求める。
-	/// </summary>
-	void FindToHundredthPlace();
+
 
 private:
-	SpriteRender			m_onesPlaceSprite;		// 1の位のスプライト
-	SpriteRender			m_tensPlaceSprite;		// 10の位のスプライト
-	SpriteRender			m_hundredthPlaceSprite;	// 100の位のスプライト
-
-	int						m_score;				// スコア
-	int						m_lastScore;			// 直前のスコア
+	SpriteRender			m_scoreNumberSprite[3];			// スコアの数字
+	SpriteRender			m_highScoreNumberSprite[3];		// ハイスコアの数字
+	int						m_numberNum = -1;				// 数字の数（最初に計算）
+	Game*					m_game = nullptr;				// ゲーム
+	int						m_score = 0;					// スコア
+	int						m_lastScore = 0;				// 直前のスコア
+	int						m_highScore = 0;				// ハイスコア
+	int						m_lastHighScore = 0;			// 直前のハイスコア
+	SpriteRender			m_scoreSprite;					// SCOREのスプライト
+	SpriteRender			m_highScoreSprite;				// HIGHSCOREのスプライト
 };
 
