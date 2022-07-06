@@ -32,5 +32,8 @@ private:
 	int m_numberNum = -1;				// 数字の数（最初に計算）
 
 	bool m_colorChangeFlag = false;		// 色変更フラグ
+
+	int m_oldTime = -1;
+
 };
 

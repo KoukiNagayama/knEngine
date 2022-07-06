@@ -35,7 +35,16 @@ void GameTimeScreen::GameTimerUpdate(const float time) {
 	// intに変換しておく
 	int now_time = (int)time;
 
-	int digit = 1;	// 初期化
+	// 更新の必要がないなら中断
+	if (m_oldTime == now_time) {
+		return;
+	}
+
+	// 現在の時間を保存しておく
+	m_oldTime = now_time;
+
+	// 初期化
+	int digit = 1;
 	int num = 0;
 
 	// 数字の更新
