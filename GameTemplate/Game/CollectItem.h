@@ -6,8 +6,8 @@ class Bell;
 class CollectItem : public IGameObject
 {
 public:
-	CollectItem() {}
-	~CollectItem() {}
+	CollectItem() {};
+	~CollectItem() {};
 
 	/// <summary>
 	/// ŠJnˆ—B

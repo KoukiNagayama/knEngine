@@ -106,6 +106,10 @@ void Game::StateTransitionProccesingFromInGame()
 	if (m_remainingTime <= GAME_END_TIME_PER_FRAME) {
 		// ステートをゲームエンドに変更する。
 		m_gameState = enGameState_GameEnd;
+		// ハイスコアを求める。
+		if (m_highScore <= m_score) {
+			m_highScore = m_score;
+		}
 		// ゲームオブジェクトを全部削除する。
 		DeleteInGameObject();
 		// タイマーの描画を停止する。
