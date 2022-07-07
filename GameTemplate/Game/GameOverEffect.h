@@ -31,6 +31,13 @@ public:
 	void StartGameOverEffect();
 
 	/// <summary>
+	/// エフェクトを終わらせる
+	/// </summary>
+	void EndGameOverEffect() {
+		m_isPlayEffect = false;
+	}
+
+	/// <summary>
 	/// ゲームオーバーエフェクトを再生
 	/// </summary>
 	void PlayGameOverEffect();
@@ -43,6 +50,14 @@ public:
 		return m_isPlayEffect;
 	}
 
+	/// <summary>
+	/// ホラー音を停止させる
+	/// （演出用）
+	/// </summary>
+	void StopHorrorSound() {
+		m_horrorSound->Stop();
+	}
+
 private:
 
 	bool m_isPlayEffect = false;		// ゲームオーバーエフェクト再生フラグ
@@ -50,6 +65,8 @@ private:
 	Player* m_player = nullptr;
 	Enemy* m_enemy = nullptr;
 	GameCamera* m_gameCamera = nullptr;
+	SoundSource* m_catchSound = nullptr;
+	SoundSource* m_horrorSound = nullptr;
 
 	// ここから演出用メンバ変数
 	Vector3 m_cameraNextTarget = Vector3::Zero;		// 次フレームの注視点を保存しておく

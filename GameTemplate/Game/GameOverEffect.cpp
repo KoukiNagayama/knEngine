@@ -14,6 +14,12 @@ namespace
 	const float CAMERA_CATCH_MUL = 0.63f;						// 捕まった時のシェイク量に乗算する（だんだん小さくする）
 
 	const Vector3 CAMERA_ALWAYS_SHAKE = { 3.0f,3.0f,3.0f };		// 常時シェイク量
+
+	const int	CATCH_SOUND_NUMBER_TO_REGISTER = 5;				// 登録する捕獲の音の番号
+	const float CATCH_VOLUME = 1.5f;							// 捕獲の音量
+	const int	HORROR_SOUND_NUMBER_TO_REGISTER = 6;			// 登録するホラーな音の番号
+	const float HORROR_VOLUME = 1.5f;							// ホラーの音量
+
 }
 
 void GameOverEffect::StartGameOverEffect() {
@@ -39,6 +45,15 @@ void GameOverEffect::StartGameOverEffect() {
 
 	// シェイク量を初期化
 	m_cameraShake = CAMERA_CATCH_SHAKE;
+
+	// 捕獲の音の登録。
+	g_soundEngine->ResistWaveFileBank(CATCH_SOUND_NUMBER_TO_REGISTER, "Assets/sound/gameover/catch.wav");
+	// ホラーな音の登録。
+	g_soundEngine->ResistWaveFileBank(HORROR_SOUND_NUMBER_TO_REGISTER, "Assets/sound/gameover/gameover1.wav");
+
+	// 効果音関連の初期化
+	m_catchSound = nullptr;
+	m_horrorSound = nullptr;
 
 }
 
@@ -81,6 +96,24 @@ void GameOverEffect::PlayGameOverEffect() {
 		};
 		// 設定する
 		g_camera3D->SetTarget(g_camera3D->GetTarget() + shake);
-
 	}
+
+	// 効果音
+	
+	// 捕獲の音源を鳴らす
+	if (m_catchSound == nullptr) {
+		m_catchSound = NewGO<SoundSource>(0);
+		m_catchSound->Init(CATCH_SOUND_NUMBER_TO_REGISTER);
+		m_catchSound->SetVolume(CATCH_VOLUME);
+		m_catchSound->Play(false);
+	}
+
+	// ホラーの音源を鳴らす
+	if (m_horrorSound == nullptr) {
+		m_horrorSound = NewGO<SoundSource>(0);
+		m_horrorSound->Init(HORROR_SOUND_NUMBER_TO_REGISTER);
+		m_horrorSound->SetVolume(HORROR_VOLUME);
+		m_horrorSound->Play(false);
+	}
+
 }

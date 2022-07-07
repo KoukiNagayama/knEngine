@@ -126,6 +126,9 @@ void Game::StateTransitionProccesingFromInGame()
 		m_gameState = enGameState_GameOver;
 		// ゲームオブジェクトを全部削除する。
 		DeleteInGameObject();
+		// ゲームオーバーエフェクトの後始末。
+		m_gameOverEffect->EndGameOverEffect();
+		m_gameOverEffect->StopHorrorSound();
 	}
 }
 
@@ -179,6 +182,7 @@ void Game::StateTransitionProccesingFromGameEnd()
 		m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
 		// リセットしておく
 		m_isResultDisplayFinished = false;
+		m_gameTimeScreen->Reset();
 	}
 }
 

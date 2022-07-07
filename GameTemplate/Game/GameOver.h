@@ -45,6 +45,13 @@ private:
 	SpriteRender			m_gameOverSprite_Text;			// ゲームオーバー文字
 	SpriteRender			m_gameOverSprite_Blood;			// ゲームオーバー血飛沫
 
+	SoundSource*			m_gameoverSound = nullptr;		// ゲームオーバー音
+	SoundSource*			m_bloodSound1 = nullptr;		// 血飛沫音
+	SoundSource*			m_bloodSound2 = nullptr;		
+	SoundSource*			m_bloodSound3 = nullptr;		
+	SoundSource*			m_bloodSound4 = nullptr;		
+	SoundSource*			m_bloodSound5 = nullptr;		
+
 	float					m_currentAlpha = 1.0f;			// 現在のα値
 	float					m_timerToFadeOut = 0.0f;		// フェードアウトに移行するまでの時間
 	Vector3					m_gameOverSpritePosition;		// ゲームオーバーのスプライトを表示する座標			

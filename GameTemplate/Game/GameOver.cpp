@@ -35,6 +35,12 @@ namespace
 	const float   BLOOD_START_TIME = 1.2f;	// 血飛沫が出始める時間
 	const float   BLOOD_WAIT_TIME = 0.06f;	// 血飛沫の更新時間
 
+	const int	GAMEOVER_SOUND_NUMBER_TO_REGISTER = 7;			// 登録するゲームオーバー音の番号
+	const float GAMEOVER_VOLUME = 1.5f;							// ゲームオーバーの音量
+	const float GAMEOVER_RATIO = 0.5f;							// ゲームオーバーの周波数
+	const int	BLOOD_SOUND_NUMBER_TO_REGISTER = 8;				// 登録する血飛沫音の番号
+	const float BLOOD_VOLUME = 1.5f;							// 血飛沫の音量
+
 }
 
 bool GameOver::Start()
@@ -73,6 +79,20 @@ bool GameOver::Start()
 
 	// 要素数を計算
 	m_shakeNum = sizeof(SPRITE_SHAKE_POSITION) / sizeof(Vector3);
+
+	// ゲームオーバーの音の登録。
+	g_soundEngine->ResistWaveFileBank(GAMEOVER_SOUND_NUMBER_TO_REGISTER, "Assets/sound/gameover/gameover2.wav");
+	// 血飛沫の音の登録。
+	g_soundEngine->ResistWaveFileBank(BLOOD_SOUND_NUMBER_TO_REGISTER, "Assets/sound/gameover/blood.wav");
+
+	// ゲームオーバーの音源を鳴らす
+	if (m_gameoverSound == nullptr) {
+		m_gameoverSound = NewGO<SoundSource>(0);
+		m_gameoverSound->Init(GAMEOVER_SOUND_NUMBER_TO_REGISTER);
+		m_gameoverSound->SetVolume(GAMEOVER_VOLUME);
+		m_gameoverSound->SetFrequencyRatio(GAMEOVER_RATIO);
+		m_gameoverSound->Play(false);
+	}
 
 	return true;
 }
@@ -154,6 +174,13 @@ void GameOver::BloodInit() {
 			GAME_OVER_SPRITE_W,
 			GAME_OVER_SPRITE_H
 		);
+		// 血飛沫の音源を鳴らす
+		if (m_bloodSound1 == nullptr) {
+			m_bloodSound1 = NewGO<SoundSource>(0);
+			m_bloodSound1->Init(BLOOD_SOUND_NUMBER_TO_REGISTER);
+			m_bloodSound1->SetVolume(BLOOD_VOLUME);
+			m_bloodSound1->Play(false);
+		}
 		break;
 	case 1:
 		m_gameOverSprite_Blood.Init(
@@ -161,6 +188,13 @@ void GameOver::BloodInit() {
 			GAME_OVER_SPRITE_W,
 			GAME_OVER_SPRITE_H
 		);
+		// 血飛沫の音源を鳴らす
+		if (m_bloodSound2 == nullptr) {
+			m_bloodSound2 = NewGO<SoundSource>(0);
+			m_bloodSound2->Init(BLOOD_SOUND_NUMBER_TO_REGISTER);
+			m_bloodSound2->SetVolume(BLOOD_VOLUME);
+			m_bloodSound2->Play(false);
+		}
 		break;
 	case 2:
 		m_gameOverSprite_Blood.Init(
@@ -168,6 +202,13 @@ void GameOver::BloodInit() {
 			GAME_OVER_SPRITE_W,
 			GAME_OVER_SPRITE_H
 		);
+		// 血飛沫の音源を鳴らす
+		if (m_bloodSound3 == nullptr) {
+			m_bloodSound3 = NewGO<SoundSource>(0);
+			m_bloodSound3->Init(BLOOD_SOUND_NUMBER_TO_REGISTER);
+			m_bloodSound3->SetVolume(BLOOD_VOLUME);
+			m_bloodSound3->Play(false);
+		}
 		break;
 	case 3:
 		m_gameOverSprite_Blood.Init(
@@ -175,6 +216,13 @@ void GameOver::BloodInit() {
 			GAME_OVER_SPRITE_W,
 			GAME_OVER_SPRITE_H
 		);
+		// 血飛沫の音源を鳴らす
+		if (m_bloodSound4 == nullptr) {
+			m_bloodSound4 = NewGO<SoundSource>(0);
+			m_bloodSound4->Init(BLOOD_SOUND_NUMBER_TO_REGISTER);
+			m_bloodSound4->SetVolume(BLOOD_VOLUME);
+			m_bloodSound4->Play(false);
+		}
 		break;
 	case 4:
 		m_gameOverSprite_Blood.Init(
@@ -182,6 +230,13 @@ void GameOver::BloodInit() {
 			GAME_OVER_SPRITE_W,
 			GAME_OVER_SPRITE_H
 		);
+		// 血飛沫の音源を鳴らす
+		if (m_bloodSound5 == nullptr) {
+			m_bloodSound5 = NewGO<SoundSource>(0);
+			m_bloodSound5->Init(BLOOD_SOUND_NUMBER_TO_REGISTER);
+			m_bloodSound5->SetVolume(BLOOD_VOLUME);
+			m_bloodSound5->Play(false);
+		}
 		break;
 	}
 
