@@ -34,6 +34,14 @@ public:
 		m_drawFlag = flag;
 	}
 
+	/// <summary>
+	/// •Ï”ƒŠƒZƒbƒg
+	/// </summary>
+	void Reset() {
+		m_colorChangeFlag = false;
+		m_oldTime = -1;
+	}
+
 private:
 	
 	SpriteRender m_numberSprite[3];		// ”š‰æ‘œ
