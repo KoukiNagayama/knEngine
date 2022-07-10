@@ -1,4 +1,6 @@
 #pragma once
+#include "sound/SoundSource.h"
+
 class EdgeManagement;
 class Player;
 class Game;
@@ -71,5 +73,6 @@ private:
 	int						m_currentColor;							// 現在の色
 	Bell*					m_bell = nullptr;						// ベル
 	float					m_resetColorTimerPerSec = 0.0f;			// 色をリセットするタイマー(単位:秒)
+	SoundSource*			m_pickUpBellSound = nullptr;
 };
 

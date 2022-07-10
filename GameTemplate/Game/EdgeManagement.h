@@ -110,6 +110,7 @@ private:
 		enSoundSourceData_EnemyFootstep,	// エネミーの足音
 		enSoundSourceData_EnemyScream,		// エネミーの咆哮
 		enSoundSourceData_Title,			// タイトル
+		//enSoundSourceData_TitleBell,		// タイトルでのベル
 		enSoundSourceData_Num				// 音の個数
 	};
 
@@ -139,5 +140,10 @@ private:
 	bool					m_isLastEnemyScream = false;							// エネミーの咆哮は直前は鳴っていたか
 	Vector3					m_positionOfCenterInTitle = Vector3::Zero;				// タイトルの時の中心の座標
 	Game*					m_game = nullptr;										// ゲーム
+	float					m_rateByTimeOfTitleBell = 1.0f;
+
+
+
+
 };
 

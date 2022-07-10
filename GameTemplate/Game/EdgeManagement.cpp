@@ -7,20 +7,19 @@
 #include "Game.h"
 namespace
 {
-	const float BELL_RANGE = 2000.0f;					// ƒxƒ‹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
-	const float PLAYER_FOOTSTEP_RANGE = 300.0f;			// ƒvƒŒƒCƒ„[‚Ì‘«‰¹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
-	const float ENEMY_FOOTSTEP_RANGE = 450.0f;			// ƒGƒlƒ~[‚Ì‘«‰¹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
-	const float ENEMY_SCREAM_RANGE = 1300.0f;			// ƒGƒlƒ~[‚Ì™ôšK‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
-	const float TITLE_RANGE = 800.0f;					// ƒ^ƒCƒgƒ‹‚Å—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
-	const float TITLE_OUTLINE_RATE = 1.0f;				// ƒ^ƒCƒgƒ‹‚Å‚Ì—ÖŠsü‚Ì‰e‹¿—¦
-	const float NO_TITLE_OUTLINE_RATE = 0.0f;			// ƒ^ƒCƒgƒ‹‚Å‚Ì—ÖŠsü‚Ì‰e‹¿—¦‚È‚µ
-
-	const int IS_SOUND = 1;								// ‰¹‚ª–Â‚Á‚Ä‚¢‚é
-	const int IS_NOT_SOUND = 0;							// ‰¹‚ª–Â‚Á‚Ä‚¢‚È‚¢
-	const float EDGE_FADE_IN_DELTA_VALUE = 0.05f;		// ƒGƒbƒW‚ªƒtƒF[ƒhƒCƒ“‚·‚é‚Æ‚«‚Ì•ÏˆÊ—Ê
-	const float EDGE_FADE_OUT_DELTA_VALUE = 0.0065f;	// ƒGƒbƒW‚ªƒtƒF[ƒhƒAƒEƒg‚·‚é‚Æ‚«‚Ì•ÏˆÊ—Ê
-	const float RATE_BY_TIME_MAX_VALUE = 1.00f;			// ŽžŠÔ‚É‚æ‚é‰e‹¿—¦‚ÌÅ‘å’l
-	const float RATE_BY_TIME_MIN_VALUE = 0.00f;			// ŽžŠÔ‚É‚æ‚é‰e‹¿—¦‚ÌÅ¬’l
+	const float BELL_RANGE = 800.0f;						// ƒxƒ‹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
+	const float PLAYER_FOOTSTEP_RANGE = 300.0f;				// ƒvƒŒƒCƒ„[‚Ì‘«‰¹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
+	const float ENEMY_FOOTSTEP_RANGE = 450.0f;				// ƒGƒlƒ~[‚Ì‘«‰¹‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
+	const float ENEMY_SCREAM_RANGE = 1300.0f;				// ƒGƒlƒ~[‚Ì™ôšK‚ª—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
+	const float TITLE_RANGE = 800.0f;						// ƒ^ƒCƒgƒ‹‚Å—ÖŠsü‚É‰e‹¿‚ð—^‚¦‚é”ÍˆÍ
+	const float TITLE_OUTLINE_RATE = 1.0f;					// ƒ^ƒCƒgƒ‹‚Å‚Ì—ÖŠsü‚Ì‰e‹¿—¦
+	const float NO_TITLE_OUTLINE_RATE = 0.0f;				// ƒ^ƒCƒgƒ‹‚Å‚Ì—ÖŠsü‚Ì‰e‹¿—¦‚È‚µ
+	const int IS_SOUND = 1;									// ‰¹‚ª–Â‚Á‚Ä‚¢‚é
+	const int IS_NOT_SOUND = 0;								// ‰¹‚ª–Â‚Á‚Ä‚¢‚È‚¢
+	const float EDGE_FADE_IN_DELTA_VALUE = 0.05f;			// ƒGƒbƒW‚ªƒtƒF[ƒhƒCƒ“‚·‚é‚Æ‚«‚Ì•ÏˆÊ—Ê
+	const float EDGE_FADE_OUT_DELTA_VALUE = 0.0065f;		// ƒGƒbƒW‚ªƒtƒF[ƒhƒAƒEƒg‚·‚é‚Æ‚«‚Ì•ÏˆÊ—Ê
+	const float RATE_BY_TIME_MAX_VALUE = 1.00f;				// ŽžŠÔ‚É‚æ‚é‰e‹¿—¦‚ÌÅ‘å’l
+	const float RATE_BY_TIME_MIN_VALUE = 0.00f;				// ŽžŠÔ‚É‚æ‚é‰e‹¿—¦‚ÌÅ¬’l
 }
 
 void EdgeManagement::Init()
@@ -91,6 +90,15 @@ void EdgeManagement::Init()
 		TITLE_OUTLINE_RATE
 	);
 	m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_NOT_SOUND);
+
+	// ƒ^ƒCƒgƒ‹‚ÌŽž‚Ìƒxƒ‹‚Ì‰¹‚Ì—ÖŠsü‚Ö‚Ì‰e‹¿‚ð‰Šú‰»B
+	/*m_edgeControl.Init(
+		enSoundSourceData_TitleBell,
+		m_player->GetPosition(),
+		BELL_RANGE,
+		m_rateByTimeOfTitleBell
+	);
+	m_edgeControl.SetIsSound(enSoundSourceData_TitleBell, IS_NOT_SOUND);*/
 }
 
 void EdgeManagement::Update()

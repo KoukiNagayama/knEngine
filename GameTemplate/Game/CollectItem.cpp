@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Game.h"
 #include "Bell.h"
+#include "sound/SoundEngine.h"
 
 namespace
 {
@@ -13,11 +14,13 @@ namespace
 	const int EDGE_COLOR_YELLOW = 2;								// 輪郭線の色(黄)
 	const Vector3 ITEM_MODEL_SCALE = { 5.0f,5.0f,5.0f };			// モデルの拡大率
 	const float PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM = 100.0f;	// プレイヤーがアイテムを取得可能な距離
-	const float TIME_TO_DRAW_AGAIN_PER_SEC = 5.0f;					// 再び描画するまでの時間。(単位:秒)
+	const float TIME_TO_DRAW_AGAIN_PER_SEC = 30.0f;					// 再び描画するまでの時間。(単位:秒)
 	const float MINIMUM_TIMER_VALUE = 0.0f;							// タイマーの最低値
 	const int LOW_POINT = 1;										// 低いポイントを取得した時に代入する値。
 	const int HIGH_POINT = 3;										// 高いポイントを取得した時に代入する値。
 	const float COLOR_CHANGE_DISTANCE_TO_PLAYER = 500.0f;			// 色を変更するプレイヤーとの距離
+	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;					// ベルを取得した音の登録番号
+	const float PICK_UP_BELL_VOLUME = 1.0f;							// ベルを取得した際の音の音量
 }
 
 bool CollectItem::Start()
@@ -29,7 +32,7 @@ bool CollectItem::Start()
 		NUM_ANIMATIONCLIP,
 		enModelUpAxisZ,
 		MAX_INSTANCE,
-		EDGE_COLOR_WHITE,
+		EDGE_COLOR_YELLOW,
 		m_edgeManagement->GetEdgeControl()
 	);
 	// モデルの拡大率を設定。
@@ -53,6 +56,9 @@ bool CollectItem::Start()
 
 void CollectItem::Update()
 {
+	// 回転させる。
+	Rotation();
+
 	// 描画されていないならば。
 	if (m_isDraw == false) {
 		// 出現するまでの時間を調べる。
@@ -64,10 +70,7 @@ void CollectItem::Update()
 	RetrieveItem();
 
 	// 色を変更するか調べる。
-	CheckChangeColor();
-
-	// 回転させる。
-	Rotation();
+	//CheckChangeColor();
 
 	// 座標を設定。
 	m_itemModel.SetPosition(m_position);
@@ -101,7 +104,7 @@ void CollectItem::RetrieveItem()
 	// プレイヤーがアイテムを取得するならば。
 	if (m_distToPlayer.Length() < PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM) {
 		// 現在の色が白ならば。
-		if (m_currentColor == EDGE_COLOR_WHITE) {
+		/*if (m_currentColor == EDGE_COLOR_WHITE) {
 			// スコアを1増やす。
 			m_game->AddScore(LOW_POINT);
 		}
@@ -109,12 +112,18 @@ void CollectItem::RetrieveItem()
 		else if (m_currentColor == EDGE_COLOR_YELLOW) {
 			// スコアを3増やす。
 			m_game->AddScore(HIGH_POINT);
-		}
+		}*/
+		m_game->AddScore(LOW_POINT);
 
 		// 描画をしないようにする。
 		m_isDraw = false;
 		// 再び描画されるまでのタイマーをリセット。
 		m_drawAgainTimerPerSec = TIME_TO_DRAW_AGAIN_PER_SEC;
+
+		m_pickUpBellSound = NewGO<SoundSource>(0);
+		m_pickUpBellSound->Init(PICK_UP_BELL_NUMBER_TO_REGISTER);
+		m_pickUpBellSound->SetVolume(PICK_UP_BELL_VOLUME);
+		m_pickUpBellSound->Play(false);
 	}
 }
 

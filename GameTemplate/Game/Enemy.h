@@ -95,13 +95,25 @@ public:
 	{
 		return m_isMove;
 	}
+	/// <summary>
+	/// 攻撃をしているか。
+	/// </summary>
+	/// <returns>しているならばtrue。していないならばfalse。</returns>
 	const bool IsAttacking()
 	{
 		return m_isAttackable;
 	}
+	/// <summary>
+	/// 逃走時の音を再生するか。
+	/// </summary>
+	/// <returns>再生するならばtrue。しないならばfalse。</returns>
+	const bool IsPlayEscapeSound()
+	{
+		return m_isPlayEscapeSound;
+	}
 private:
 	/// <summary>
-	/// 回転
+	/// 回転処理
 	/// </summary>
 	void Rotation();
 	/// <summary>
@@ -234,7 +246,8 @@ private:
 	SoundSource*			m_stepSound = nullptr;
 	SoundSource*			m_screamSound = nullptr;
 	Game*					m_game = nullptr;
-
+	bool					m_isPlayEscapeSound = false;
+	float					m_screamEndTimer = 0.0f;					// 咆哮終了までのタイマー
 
 
 };

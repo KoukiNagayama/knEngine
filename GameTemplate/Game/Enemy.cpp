@@ -33,6 +33,7 @@ namespace
 	const float ENEMY_FOOTSTEP_SOUND_MAXIMUM_VOLUME = 1.0f;			// 足音の最大音量
 	const float ENEMY_FOOTSTEP_SOUND_MINIMUM_VOLUME = 0.0f;			// 足音の最小音量
 	const float FOOTSTEP_RANGE_TO_PLAYER = 1350.0f;					// 足音がプレイヤーに届く範囲
+	const float TIME_TO_END_SCREAM_PER_SEC = 3.0f;					// 咆哮が終了するまでの時間
 }
 
 Enemy::~Enemy()
@@ -282,7 +283,10 @@ void Enemy::Scream()
 		m_isScream = true;
 	}
 
-	if (m_enemyModel.IsPlayingAnimation() == false) {
+	// タイマー。
+	m_screamEndTimer -= g_gameTime->GetFrameDeltaTime();
+
+	if (m_screamEndTimer <= 0.0f) {
 		m_isScream = false;
 		m_screamSound = nullptr;
 	}
@@ -416,8 +420,11 @@ void Enemy::ProcessWalkStateTransition()
 	m_screamRateByTime = 0.0f;
 	m_isScream = true;
 	m_isMove = false;
+	// 咆哮が終了するまでのタイマーをリセット。
+	m_screamEndTimer = TIME_TO_END_SCREAM_PER_SEC;
 	// ステートを咆哮状態にする
 	m_enemyState = enEnemyState_Scream;
+
 }
 
 void Enemy::ProcessScreamStateTransition()
@@ -431,6 +438,8 @@ void Enemy::ProcessScreamStateTransition()
 	m_chaseTime = MINIMUM_CHASE_TIME;
 	// ステートを追跡状態にする
 	m_enemyState = enEnemyState_Chase;
+	// 追跡の音を流す。
+	m_isPlayEscapeSound = true;
 }
 
 void Enemy::ProcessChaseStateTransition()
@@ -456,6 +465,7 @@ void Enemy::ProcessChaseStateTransition()
 		// パスを検索する間隔をリセット
 		m_pathFindingTimer = PATH_FINDING_TIMER;
 		m_isMove = false;
+		m_isPlayEscapeSound = false;
 
 	}
 
@@ -469,6 +479,8 @@ void Enemy::ProcessSurveyStateTransition()
 		m_chaseTime = MINIMUM_CHASE_TIME;
 		// 追跡を開始
 		m_enemyState = enEnemyState_Chase;
+		// 追跡の音を流す。
+		m_isPlayEscapeSound = true;
 
 		m_isMove = true;
 	}
@@ -496,8 +508,11 @@ void Enemy::ProcessReturnToPathStateTransition()
 		// 咆哮をリセット
 		m_screamRateByTime = 0.0f;
 		m_isScream = true;
+		// 咆哮が終了するまでのタイマーをリセット。
+		m_screamEndTimer = TIME_TO_END_SCREAM_PER_SEC;
 		// ステートを咆哮状態にする
 		m_enemyState = enEnemyState_Scream;
+
 
 		m_isMove = false;
 	}

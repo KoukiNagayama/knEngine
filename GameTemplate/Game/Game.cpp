@@ -14,18 +14,26 @@
 #include "GameOverEffect.h"
 #include "Score.h"
 #include "Result.h"
+#include "sound/SoundEngine.h"
 
 namespace
 {
-	const int SETTING_TIME_3_MIN_PER_FRAME = 180.0f;	// フレームごとで制限時間を3分に設定。
-	const int SETTING_TIME_6_MIN_PER_FRAME = 360.0f;	// フレームごとで制限時間を5分に設定。	
+	const int SETTING_TIME_3_MIN_PER_SEC = 180.0f;		// 秒ごとで制限時間を3分に設定。
+	const int SETTING_TIME_6_MIN_PER_SEC = 360.0f;	// 秒ごとで制限時間を5分に設定。	
 	const int GAME_END_TIME_PER_FRAME = 0.0f;			// フレームごとでゲームが終了する時間
+	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;		// ベルを取得した音の登録番号
+	const int ESCAPE_SOUND_NUMBER_TO_REGISTER = 10;		// 逃走時の音の登録番号
+	const float ESCAPE_VOLUME_MULTIPLIER = 0.3f;		// 逃走時の音の乗算する値
+	const float MAX_ESCAPE_VOLUME = 1.0f;
+	const float MIN_ESCAPE_VOLUME = 0.0f;
 }
 
 bool Game::Start()
 {
 	StartTitle();
-
+	
+	g_soundEngine->ResistWaveFileBank(PICK_UP_BELL_NUMBER_TO_REGISTER, "Assets/sound/pickup_bell.wav");
+	g_soundEngine->ResistWaveFileBank(ESCAPE_SOUND_NUMBER_TO_REGISTER, "Assets/sound/escape_00.wav");
 	// 残り時間を表示するオブジェクトを作成（前面に出すため描画順番遅め）
 	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
 	// 無を描画しないように初期化
@@ -52,7 +60,9 @@ void Game::Update()
 		GameTimer();
 		// 輪郭線制御情報を管理。
 		m_edgeManagement.Update();
+
 	}
+	PlayEscapeSound();
 
 }
 
@@ -183,14 +193,16 @@ void Game::StateTransitionProccesingFromGameEnd()
 		// リセットしておく
 		m_isResultDisplayFinished = false;
 		m_gameTimeScreen->Reset();
+		m_score = 0;
+		m_highScore = 0;
 	}
 }
 
 void Game::InitInGame()
 {
-	m_inGameLevel.Init("Assets/level3D/stage.tkl", [&](LevelObjectData& objData) {
+	m_inGameLevel.Init("Assets/level3D/stage2.tkl", [&](LevelObjectData& objData) {
 		//ステージ
-		if (objData.EqualObjectName(L"floor2") == true) {
+		if (objData.EqualObjectName(L"stage") == true) {
 			// 背景クラス
 			m_inGameStage = NewGO<BackGround>(0, "backGround");
 			m_inGameStage->SetPosition(objData.position);
@@ -219,42 +231,19 @@ void Game::InitInGame()
 			m_enemy->SetEdgeManagement(&m_edgeManagement);
 			return true;
 		}
-		//つみき
-		if (objData.EqualObjectName(L"crashtoy") == true) {
-			return true;
-		}
-		//蓄音機
-		if (objData.ForwardMatchName(L"gramophone") == true)
+		// 収集アイテム
+		if (objData.EqualObjectName(L"collectItem") == true)
 		{
-			return true;
-		}
-
-		//レコード
-		if (objData.ForwardMatchName(L"record") == true)
-		{
-			return true;
-		}
-		if (objData.ForwardMatchName(L"door") == true)
-		{
-			return true;
-		}
-		if (objData.ForwardMatchName(L"switchfloor") == true)
-		{
-			return true;
-		}
-		if (objData.ForwardMatchName(L"gimmick") == true)
-		{
-			return true;
-		}
-		if (objData.EqualObjectName(L"crowbar") == true)
-		{
+			auto collectItem = NewGO<CollectItem>(0, "collectItem");
+			collectItem->SetPosition(objData.position);
+			collectItem->SetEdgeManagement(&m_edgeManagement);
+			m_collectItem.push_back(collectItem);
 			return true;
 		}
 		return false;
 	});
- 
-	m_collectItem = NewGO<CollectItem>(0, "collectItem");
-	m_collectItem->SetEdgeManagement(&m_edgeManagement);
+	
+	// 輪郭線制御情報の初期化
 	m_edgeManagement.Init();
 
 	// ゲームオーバーエフェクトの初期化
@@ -278,12 +267,11 @@ void Game::DeleteInGameObject()
 		DeleteGO(m_gameCamera);
 	}
 
-	auto& collectItems = FindGOs<CollectItem>("collectItem");
-	int collectItemSize = collectItems.size();
-	for (int i = 0; i < collectItemSize; i++) {
-		m_collectItem = collectItems[i];
-		DeleteGO(m_collectItem);
+	for (auto collectItem : m_collectItem)
+	{
+		DeleteGO(collectItem);
 	}
+	m_collectItem.clear();
 
 	auto& bells = FindGOs<Bell>("bell");
 	int bellSize = bells.size();
@@ -353,7 +341,7 @@ void Game::StartGameOverEffect() {
 void Game::StartTitle() {
 
 	// 時間を設定。
-	m_remainingTime = SETTING_TIME_3_MIN_PER_FRAME;
+	m_remainingTime = SETTING_TIME_3_MIN_PER_SEC;
 
 	m_titleLevel.Init("Assets/level3D/title.tkl", [&](LevelObjectData& objData)
 		{
@@ -382,4 +370,61 @@ void Game::StartTitle() {
 
 	// 輪郭線情報を初期化。
 	m_edgeManagement.Init();
+}
+
+void Game::PlayEscapeSound()
+{
+	bool isPlaySound = false;
+
+	if (m_gameState == enGameState_InGame) {
+		isPlaySound = m_enemy->IsPlayEscapeSound();
+	}
+
+	// 音が鳴っていない時に鳴るように設定されたならば。
+	if (isPlaySound && m_escapeSound == nullptr) {
+		m_escapeSound = NewGO<SoundSource>(0);
+		m_escapeSound->Init(ESCAPE_SOUND_NUMBER_TO_REGISTER);
+		EscapeSoundVolumeControl(isPlaySound);
+		m_escapeSound->Play(true);
+	}
+
+	// 音は鳴っているが、音量が小さいとき。
+	if (isPlaySound && m_escapeSoundVolume < MAX_ESCAPE_VOLUME) {
+		// フェードインさせる。
+		EscapeSoundVolumeControl(true);
+	}
+	// 音が鳴っている時に鳴らないように設定されたならば。
+	else if (isPlaySound == false && m_escapeSound != nullptr) {
+		// フェードアウトさせる。
+		EscapeSoundVolumeControl(false);
+		if (m_escapeSoundVolume <= MIN_ESCAPE_VOLUME) {
+			// 音を削除。
+			DeleteGO(m_escapeSound);
+			m_escapeSound = nullptr;
+			// 音量をリセット。
+			m_escapeSoundVolume = MAX_ESCAPE_VOLUME;
+		}
+	}
+
+}
+
+void Game::EscapeSoundVolumeControl(bool fadeIn)
+{
+
+	if (fadeIn) {
+		// フェードイン。
+		m_escapeSoundVolume += ESCAPE_VOLUME_MULTIPLIER * g_gameTime->GetFrameDeltaTime();
+		// 上限値を超えるならば。
+		if (m_escapeSoundVolume > 1.0f) {
+			// 数値を固定する。
+			m_escapeSoundVolume = 1.0f;
+		}
+	}
+	else {
+		// フェードアウト。
+		m_escapeSoundVolume -= ESCAPE_VOLUME_MULTIPLIER * g_gameTime->GetFrameDeltaTime();
+
+	}	
+	// 音量を設定する。
+	m_escapeSound->SetVolume(m_escapeSoundVolume);
 }

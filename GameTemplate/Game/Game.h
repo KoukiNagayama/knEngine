@@ -2,6 +2,7 @@
 
 #include "LevelRender.h"
 #include "EdgeManagement.h"
+#include "sound/SoundSource.h"
 
 class Player;
 class GameCamera;
@@ -134,6 +135,14 @@ private:
 	/// ゲームの残り時間の処理
 	/// </summary>
 	void GameTimer();
+	/// <summary>
+	/// 逃走の音を流す。
+	/// </summary>
+	void PlayEscapeSound();
+	/// <summary>
+	/// 逃走時の音量コントロール
+	/// </summary>
+	void EscapeSoundVolumeControl(bool fadeIn);
 
 private:
 	enum EnGameState
@@ -145,29 +154,31 @@ private:
 		enGameState_GameEnd			// ゲームエンド
 	};	
 
-	EnGameState			m_gameState = enGameState_Title;		// ゲームステート
-	bool				m_isResultDisplayFinished = false;		// リザルトの表示が終了しているか
-	bool				m_isEndGameOverProcess = false;			// ゲームオーバー時の処理が終了しているか
-	LevelRender			m_inGameLevel;							// インゲームのレベル
-	Player*				m_player = nullptr;						// プレイヤークラス
-	GameCamera*			m_gameCamera = nullptr;					// ゲームカメラクラス
-	BackGround*			m_inGameStage = nullptr;				// 背景クラス
-	Bell*				m_bell = nullptr;						// ベルクラス
-	Enemy*				m_enemy = nullptr;						// エネミークラス
-	EdgeManagement		m_edgeManagement;						// 輪郭線制御
-	bool				m_isGameOver = false;					// ゲームオーバーになっているか
-	int					m_score = 0;							// プレイヤーのスコア
-	int					m_highScore = 0;						// プレイヤーのハイスコア
-	CollectItem*		m_collectItem = nullptr;				// 収集アイテム					
-	float				m_remainingTime = 0.0f;					// 残り時間
-	LevelRender			m_titleLevel;							// タイトルのレベル
-	TitleCamera*		m_titleCamera = nullptr;				// タイトルカメラクラス
-	TitleText*			m_titleText = nullptr;					// タイトルテキストクラス
-	GameOver*			m_gameOver = nullptr;					// ゲームオーバークラス
-	TitleSprite*		m_titleSprite = nullptr;				// タイトルスプライトクラス
-	GameTimeScreen*		m_gameTimeScreen = nullptr;				// 残り時間表示クラス
-	GameOverEffect*		m_gameOverEffect = nullptr;				// ゲームオーバーエフェクト
-	Score*				m_scoreScreen = nullptr;				// スコア表示クラス
-	Result*				m_result = nullptr;						// リザルトクラス
+	EnGameState					m_gameState = enGameState_Title;		// ゲームステート
+	bool						m_isResultDisplayFinished = false;		// リザルトの表示が終了しているか
+	bool						m_isEndGameOverProcess = false;			// ゲームオーバー時の処理が終了しているか
+	LevelRender					m_inGameLevel;							// インゲームのレベル
+	Player*						m_player = nullptr;						// プレイヤークラス
+	GameCamera*					m_gameCamera = nullptr;					// ゲームカメラクラス
+	BackGround*					m_inGameStage = nullptr;				// 背景クラス
+	Bell*						m_bell = nullptr;						// ベルクラス
+	Enemy*						m_enemy = nullptr;						// エネミークラス
+	EdgeManagement				m_edgeManagement;						// 輪郭線制御
+	bool						m_isGameOver = false;					// ゲームオーバーになっているか
+	int							m_score = 0;							// プレイヤーのスコア
+	int							m_highScore = 0;						// プレイヤーのハイスコア
+	std::vector<CollectItem*>	m_collectItem;							// 収集アイテム					
+	float						m_remainingTime = 0.0f;					// 残り時間
+	LevelRender					m_titleLevel;							// タイトルのレベル
+	TitleCamera*				m_titleCamera = nullptr;				// タイトルカメラクラス
+	TitleText*					m_titleText = nullptr;					// タイトルテキストクラス
+	GameOver*					m_gameOver = nullptr;					// ゲームオーバークラス
+	TitleSprite*				m_titleSprite = nullptr;				// タイトルスプライトクラス
+	GameTimeScreen*				m_gameTimeScreen = nullptr;				// 残り時間表示クラス
+	GameOverEffect*				m_gameOverEffect = nullptr;				// ゲームオーバーエフェクト
+	Score*						m_scoreScreen = nullptr;				// スコア表示クラス
+	Result*						m_result = nullptr;						// リザルトクラス
+	SoundSource*				m_escapeSound = nullptr;				// 逃走時の音
+	float						m_escapeSoundVolume = 1.0f;				// 逃走時の音量
 };
 
