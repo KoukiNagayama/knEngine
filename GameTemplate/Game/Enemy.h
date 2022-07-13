@@ -104,12 +104,12 @@ public:
 		return m_isAttackable;
 	}
 	/// <summary>
-	/// 逃走時の音を再生するか。
+	/// 追跡しているか。
 	/// </summary>
-	/// <returns>再生するならばtrue。しないならばfalse。</returns>
-	const bool IsPlayEscapeSound()
+	/// <returns>していればtrue。していなければfalse。</returns>
+	const bool IsChase()
 	{
-		return m_isPlayEscapeSound;
+		return m_isChase;
 	}
 private:
 	/// <summary>
@@ -246,7 +246,7 @@ private:
 	SoundSource*			m_stepSound = nullptr;
 	SoundSource*			m_screamSound = nullptr;
 	Game*					m_game = nullptr;
-	bool					m_isPlayEscapeSound = false;
+	bool					m_isChase = false;
 	float					m_screamEndTimer = 0.0f;					// 咆哮終了までのタイマー
 
 

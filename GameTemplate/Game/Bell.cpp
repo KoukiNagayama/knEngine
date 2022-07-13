@@ -79,10 +79,12 @@ void Bell::MoveWithPlayer()
 	m_position += g_camera3D->GetForward() * SHIFT_POSITION_FROM_CAMERA;
 	m_position += up * MODEL_POSITION_UP;
 
-	// ベルの座標を設定。
-	m_bellModel.SetPosition(m_position);
+
 	// ベルの回転を設定。
 	m_bellModel.SetRotation(m_player->GetRotation());
+
+	// ベルの座標を設定。
+	m_bellModel.SetPosition(m_position);
 
 }
 

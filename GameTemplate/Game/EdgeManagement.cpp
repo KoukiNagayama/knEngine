@@ -29,8 +29,22 @@ void EdgeManagement::Init()
 	m_bell = FindGO<Bell>("bell");
 	// プレイヤーのインスタンスを検索。
 	m_player = FindGO<Player>("player");
-	// エネミーのインスタンスを検索。
-	m_enemy = FindGO<Enemy>("enemy");
+
+	// エネミーを検索
+	const auto& enemys = FindGOs<Enemy>("enemy");
+	// エネミーの数
+	const int size = enemys.size();
+	
+	for (int i = 0; i < size; i++) {
+		switch (i) {
+		case 0:
+			m_enemy1 = enemys[i];
+			break;
+		case 1:
+			m_enemy2 = enemys[i];
+			break;
+		}
+	}
 	
 
 
@@ -55,24 +69,24 @@ void EdgeManagement::Init()
 	m_edgeControl.SetIsSound(enSoundSourceData_PlayerFootstep, IS_NOT_SOUND);
 
 
-	// エネミーの足音の輪郭線への影響を初期化。
+	// エネミー1の足音の輪郭線への影響を初期化。
 	m_edgeControl.Init(
-		enSoundSourceData_EnemyFootstep,
+		enSoundSourceData_EnemyFootstep1,
 		Vector3::Zero,
 		ENEMY_FOOTSTEP_RANGE,
 		m_rateByTimeOfEnemyFootstep
 	);
-	m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep, IS_NOT_SOUND);
+	m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep1, IS_NOT_SOUND);
 
 
-	// エネミーの咆哮の輪郭線への影響を初期化。
+	// エネミー1の咆哮の輪郭線への影響を初期化。
 	m_edgeControl.Init(
-		enSoundSourceData_EnemyScream,
+		enSoundSourceData_EnemyScream1,
 		Vector3::Zero,
 		ENEMY_SCREAM_RANGE,
 		m_rateByTimeOfEnemyScream
 	);
-	m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream, IS_NOT_SOUND);
+	m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream1, IS_NOT_SOUND);
 
 	// タイトルの時は。
 	if (m_game->IsTitle()) {
@@ -93,17 +107,36 @@ void EdgeManagement::Init()
 
 	// タイトルの時のベルの音の輪郭線への影響を初期化。
 	/*m_edgeControl.Init(
-		enSoundSourceData_TitleBell,
-		m_player->GetPosition(),
+		enSoundSourceData_BellAfterTitle,
+		Vector3::Zero,
 		BELL_RANGE,
-		m_rateByTimeOfTitleBell
+		enSoundSourceData_BellAfterTitle
 	);
-	m_edgeControl.SetIsSound(enSoundSourceData_TitleBell, IS_NOT_SOUND);*/
+	m_edgeControl.SetIsSound(enSoundSourceData_BellAfterTitle, IS_NOT_SOUND);*/
+
+	// エネミー2の足音の輪郭線への影響を初期化。
+	m_edgeControl.Init(
+		enSoundSourceData_EnemyFootstep2,
+		Vector3::Zero,
+		ENEMY_FOOTSTEP_RANGE,
+		m_rateByTimeOfEnemyFootstep2
+	);
+	m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep2, IS_NOT_SOUND);
+
+	// エネミー2の咆哮の輪郭線への影響を初期化。
+	m_edgeControl.Init(
+		enSoundSourceData_EnemyScream2,
+		Vector3::Zero,
+		ENEMY_SCREAM_RANGE,
+		m_rateByTimeOfEnemyScream2
+	);
+	m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream2, IS_NOT_SOUND);
+
 }
 
 void EdgeManagement::Update()
 {
-	if (m_bell == nullptr || m_player == nullptr || m_enemy == nullptr) {
+	if (m_bell == nullptr || m_player == nullptr || m_enemy1 == nullptr || m_enemy2 == nullptr) {
 		return;
 	}
 
@@ -119,6 +152,10 @@ void EdgeManagement::Update()
 
 	// 時間による影響率を指定。
 	SpecifyRateByTime();
+
+	//m_edgeControl.SetPosition(enSoundSourceData_BellAfterTitle, m_player->GetPosition());
+
+	//m_edgeControl.SetRate(enSoundSourceData_BellAfterTitle, m_rateByTimeOfBellAfterTitle);
 
 
 }
@@ -137,11 +174,17 @@ void EdgeManagement::SpecifyPosition()
 	// プレイヤーの足音。
 	m_edgeControl.SetPosition(enSoundSourceData_PlayerFootstep, m_player->GetPosition());
 
-	// エネミーの足音。
-	m_edgeControl.SetPosition(enSoundSourceData_EnemyFootstep, m_enemy->GetPosition());
+	// エネミー1の足音。
+	m_edgeControl.SetPosition(enSoundSourceData_EnemyFootstep1, m_enemy1->GetPosition());
 
-	// エネミーの咆哮。
-	m_edgeControl.SetPosition(enSoundSourceData_EnemyScream, m_enemy->GetPosition());
+	// エネミー1の咆哮。
+	m_edgeControl.SetPosition(enSoundSourceData_EnemyScream1, m_enemy1->GetPosition());
+
+	// エネミー2の足音。
+	m_edgeControl.SetPosition(enSoundSourceData_EnemyFootstep2, m_enemy2->GetPosition());
+	
+	// エネミー2の咆哮。
+	m_edgeControl.SetPosition(enSoundSourceData_EnemyScream2, m_enemy2->GetPosition());
 }
 
 void EdgeManagement::SpecifyIsSound()
@@ -160,11 +203,17 @@ void EdgeManagement::SpecifyIsSound()
 	// プレイヤーの足音。
 	SpecifyIsPlayerFootstepSounding();
 
-	// エネミーの足音。
-	SpecifyIsEnemyFootstepSounding();
+	// エネミー1の足音。
+	SpecifyIsEnemyFootstep1Sounding();
 
-	// エネミーの咆哮。
-	SpecifyIsEnemyScreamSounding();
+	// エネミー1の咆哮。
+	SpecifyIsEnemyScream1Sounding();
+
+	// エネミー2の足音。
+	SpecifyIsEnemyFootstep2Sounding();
+
+	// エネミー2の咆哮。
+	SpecifyIsEnemyScream2Sounding();
 
 	
 }
@@ -196,31 +245,59 @@ void EdgeManagement::SpecifyIsPlayerFootstepSounding()
 	}
 }
 
-void EdgeManagement::SpecifyIsEnemyFootstepSounding()
+void EdgeManagement::SpecifyIsEnemyFootstep1Sounding()
 {
 	// 鳴っている時。
-	if (m_enemy->IsMoving() == true && m_isLastEnemyFootstepSound == false) {
-		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep, IS_SOUND);
+	if (m_enemy1->IsMoving() == true && m_isLastEnemyFootstepSound == false) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep1, IS_SOUND);
 		m_isLastEnemyFootstepSound = true;
 	}
 	// 鳴っていない時。
-	else if (m_enemy->IsMoving() == false && m_isLastEnemyFootstepSound == true) {
-		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep, IS_NOT_SOUND);
+	else if (m_enemy1->IsMoving() == false && m_isLastEnemyFootstepSound == true) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep1, IS_NOT_SOUND);
 		m_isLastEnemyFootstepSound = false;
 	}
 }
 
-void EdgeManagement::SpecifyIsEnemyScreamSounding()
+void EdgeManagement::SpecifyIsEnemyScream1Sounding()
 {
 	// 鳴っている時。
-	if (m_enemy->IsScream() == true && m_isLastEnemyScream == false) {
-		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream, IS_SOUND);
+	if (m_enemy1->IsScream() == true && m_isLastEnemyScream == false) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream1, IS_SOUND);
 		m_isLastEnemyScream = true;
 	}
 	// 鳴っていない時。
-	else if (m_enemy->IsScream() == false && m_isLastEnemyScream == true) {
-		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream, IS_NOT_SOUND);
+	else if (m_enemy1->IsScream() == false && m_isLastEnemyScream == true) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream1, IS_NOT_SOUND);
 		m_isLastEnemyScream = false;
+	}
+}
+
+void EdgeManagement::SpecifyIsEnemyFootstep2Sounding()
+{
+	// 鳴っている時。
+	if (m_enemy2->IsMoving() == true && m_isLastEnemyFootstep2Sound == false) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep2, IS_SOUND);
+		m_isLastEnemyFootstep2Sound = true;
+	}
+	// 鳴っていない時。
+	else if (m_enemy2->IsMoving() == false && m_isLastEnemyFootstep2Sound == true) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyFootstep2, IS_NOT_SOUND);
+		m_isLastEnemyFootstep2Sound = false;
+	}
+}
+
+void EdgeManagement::SpecifyIsEnemyScream2Sounding()
+{
+	// 鳴っている時。
+	if (m_enemy2->IsScream() == true && m_isLastEnemyScream2 == false) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream2, IS_SOUND);
+		m_isLastEnemyScream2 = true;
+	}
+	// 鳴っていない時。
+	else if (m_enemy2->IsScream() == false && m_isLastEnemyScream2 == true) {
+		m_edgeControl.SetIsSound(enSoundSourceData_EnemyScream2, IS_NOT_SOUND);
+		m_isLastEnemyScream2 = false;
 	}
 }
 
@@ -230,10 +307,14 @@ void EdgeManagement::SpecifyRateByTime()
 	CalcRateOfBell();
 	// プレイヤーの足音。
 	CalcRateOfPlayerFootstep();
-	// エネミーの足音。
-	CalcRateOfEnemyFootstep();
-	// エネミーの咆哮。
-	CalcRateOfEnemyScream();
+	// エネミー1の足音。
+	CalcRateOfEnemyFootstep1();
+	// エネミー1の咆哮。
+	CalcRateOfEnemyScream1();
+	// エネミー2の足音。
+	CalcRateOfEnemyFootstep2();
+	// エネミー2の咆哮。
+	CalcRateOfEnemyScream2();
 	// タイトル。
 	m_edgeControl.SetRate(enSoundSourceData_Title, NO_TITLE_OUTLINE_RATE);
 }
@@ -302,10 +383,10 @@ void EdgeManagement::CalcRateOfPlayerFootstep()
 	m_edgeControl.SetRate(enSoundSourceData_PlayerFootstep, m_rateByTimeOfPlayerFootstep);
 }
 
-void EdgeManagement::CalcRateOfEnemyFootstep()
+void EdgeManagement::CalcRateOfEnemyFootstep1()
 {
 	// プレイヤーの足音が鳴っているならば。
-	if (m_enemy->IsMoving()) {
+	if (m_enemy1->IsMoving()) {
 		// プレイヤーの足音の影響率を上げるようにする。
 		m_isRateUpOfEnemyFootstep = true;
 	}
@@ -331,13 +412,13 @@ void EdgeManagement::CalcRateOfEnemyFootstep()
 		}
 	}
 	// プレイヤーの足音の影響率を設定。
-	m_edgeControl.SetRate(enSoundSourceData_EnemyFootstep, m_rateByTimeOfEnemyFootstep);
+	m_edgeControl.SetRate(enSoundSourceData_EnemyFootstep1, m_rateByTimeOfEnemyFootstep);
 }
 
-void EdgeManagement::CalcRateOfEnemyScream()
+void EdgeManagement::CalcRateOfEnemyScream1()
 {
 	// プレイヤーの足音が鳴っているならば。
-	if (m_enemy->IsScream()) {
+	if (m_enemy1->IsScream()) {
 		// プレイヤーの足音の影響率を上げるようにする。
 		m_isRateUpOfEnemyScream = true;
 	}
@@ -363,5 +444,70 @@ void EdgeManagement::CalcRateOfEnemyScream()
 		}
 	}
 	// プレイヤーの足音の影響率を設定。
-	m_edgeControl.SetRate(enSoundSourceData_EnemyScream, m_rateByTimeOfEnemyScream);
+	m_edgeControl.SetRate(enSoundSourceData_EnemyScream1, m_rateByTimeOfEnemyScream);
 }
+
+void EdgeManagement::CalcRateOfEnemyFootstep2()
+{
+	// プレイヤーの足音が鳴っているならば。
+	if (m_enemy2->IsMoving()) {
+		// プレイヤーの足音の影響率を上げるようにする。
+		m_isRateUpOfEnemyFootstep2 = true;
+	}
+	// プレイヤーの足音を上げるようになっているならば。
+	if (m_isRateUpOfEnemyFootstep2) {
+		// 影響率が最大値未満であれば。
+		if (m_rateByTimeOfEnemyFootstep2 < RATE_BY_TIME_MAX_VALUE) {
+			// 影響率を上げる。
+			m_rateByTimeOfEnemyFootstep2 += EDGE_FADE_IN_DELTA_VALUE;
+		}
+		// 影響率が最大値を超えているならば。
+		else {
+			// 影響率を上げないようにする。
+			m_isRateUpOfEnemyFootstep2 = false;
+		}
+	}
+	// プレイヤーの足音の影響率が0より大きいならば
+	else if (m_rateByTimeOfEnemyFootstep2 > RATE_BY_TIME_MIN_VALUE) {
+		// 影響率を下げる。
+		m_rateByTimeOfEnemyFootstep2 -= EDGE_FADE_OUT_DELTA_VALUE;
+		if (m_rateByTimeOfEnemyFootstep2 < RATE_BY_TIME_MIN_VALUE) {
+			m_rateByTimeOfEnemyFootstep2 = RATE_BY_TIME_MIN_VALUE;
+		}
+	}
+	// プレイヤーの足音の影響率を設定。
+	m_edgeControl.SetRate(enSoundSourceData_EnemyFootstep2, m_rateByTimeOfEnemyFootstep2);
+}
+
+void EdgeManagement::CalcRateOfEnemyScream2()
+{
+	// プレイヤーの足音が鳴っているならば。
+	if (m_enemy2->IsScream()) {
+		// プレイヤーの足音の影響率を上げるようにする。
+		m_isRateUpOfEnemyScream2 = true;
+	}
+	// プレイヤーの足音を上げるようになっているならば。
+	if (m_isRateUpOfEnemyScream2) {
+		// 影響率が最大値未満であれば。
+		if (m_rateByTimeOfEnemyScream2 < RATE_BY_TIME_MAX_VALUE) {
+			// 影響率を上げる。
+			m_rateByTimeOfEnemyScream2 += EDGE_FADE_IN_DELTA_VALUE;
+		}
+		// 影響率が最大値を超えているならば。
+		else {
+			// 影響率を上げないようにする。
+			m_isRateUpOfEnemyScream2 = false;
+		}
+	}
+	// プレイヤーの足音の影響率が0より大きいならば
+	else if (m_rateByTimeOfEnemyScream2 > RATE_BY_TIME_MIN_VALUE) {
+		// 影響率を下げる。
+		m_rateByTimeOfEnemyScream2 -= EDGE_FADE_OUT_DELTA_VALUE;
+		if (m_rateByTimeOfEnemyScream2 < RATE_BY_TIME_MIN_VALUE) {
+			m_rateByTimeOfEnemyScream2 = RATE_BY_TIME_MIN_VALUE;
+		}
+	}
+	// プレイヤーの足音の影響率を設定。
+	m_edgeControl.SetRate(enSoundSourceData_EnemyScream2, m_rateByTimeOfEnemyScream2);
+}
+

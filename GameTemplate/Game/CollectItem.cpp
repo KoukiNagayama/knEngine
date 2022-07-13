@@ -14,13 +14,14 @@ namespace
 	const int EDGE_COLOR_YELLOW = 2;								// 輪郭線の色(黄)
 	const Vector3 ITEM_MODEL_SCALE = { 5.0f,5.0f,5.0f };			// モデルの拡大率
 	const float PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM = 100.0f;	// プレイヤーがアイテムを取得可能な距離
-	const float TIME_TO_DRAW_AGAIN_PER_SEC = 30.0f;					// 再び描画するまでの時間。(単位:秒)
+	const float TIME_TO_DRAW_AGAIN_PER_SEC = 60.0f;					// 再び描画するまでの時間。(単位:秒)
 	const float MINIMUM_TIMER_VALUE = 0.0f;							// タイマーの最低値
 	const int LOW_POINT = 1;										// 低いポイントを取得した時に代入する値。
 	const int HIGH_POINT = 3;										// 高いポイントを取得した時に代入する値。
 	const float COLOR_CHANGE_DISTANCE_TO_PLAYER = 500.0f;			// 色を変更するプレイヤーとの距離
 	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;					// ベルを取得した音の登録番号
 	const float PICK_UP_BELL_VOLUME = 1.0f;							// ベルを取得した際の音の音量
+	const float ADD_ROTATION_PER_FRAME = 1.5f;						// フレームごとに回転を増加させる値
 }
 
 bool CollectItem::Start()
@@ -82,7 +83,7 @@ void CollectItem::Update()
 void CollectItem::Rotation()
 {
 	// 回転を加算。
-	m_rotation.AddRotationDegY(1.5f);
+	m_rotation.AddRotationDegY(ADD_ROTATION_PER_FRAME);
 	// モデルに回転の値を設定。
 	m_itemModel.SetRotation(m_rotation);
 }
@@ -103,16 +104,7 @@ void CollectItem::RetrieveItem()
 
 	// プレイヤーがアイテムを取得するならば。
 	if (m_distToPlayer.Length() < PLAYER_POSSIBLE_GET_ITEM_DISTANCE_TO_ITEM) {
-		// 現在の色が白ならば。
-		/*if (m_currentColor == EDGE_COLOR_WHITE) {
-			// スコアを1増やす。
-			m_game->AddScore(LOW_POINT);
-		}
-		// 現在の色が黄ならば。
-		else if (m_currentColor == EDGE_COLOR_YELLOW) {
-			// スコアを3増やす。
-			m_game->AddScore(HIGH_POINT);
-		}*/
+		// ポイントを加算する。
 		m_game->AddScore(LOW_POINT);
 
 		// 描画をしないようにする。

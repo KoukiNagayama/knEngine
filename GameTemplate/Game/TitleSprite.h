@@ -21,7 +21,7 @@ public:
 	void Render(RenderContext& rc);
 
 private:
-	SpriteRender				m_pressAToStartSprite;		// スプライト
+	SpriteRender				m_pressBToStartSprite;		// スプライト
 	float						m_currentAlpha = 1.0f;		// 現在のα値
 };
 

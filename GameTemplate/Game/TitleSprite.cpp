@@ -14,17 +14,17 @@ namespace
 bool TitleSprite::Start()
 {
 	// スプライトを初期化する。
-	m_pressAToStartSprite.Init(
-		"Assets/sprite/PRESS_A_TO_START.DDS",
+	m_pressBToStartSprite.Init(
+		"Assets/sprite/PRESS_B_TO_START.DDS",
 		TEXT_SPRITE_W,
 		TEXT_SPRITE_H
 	);
 
 	// スプライトの座標を設定する。
-	m_pressAToStartSprite.SetPosition(TEXT_SPRITE_POSITION);
+	m_pressBToStartSprite.SetPosition(TEXT_SPRITE_POSITION);
 
 	// スプライトの拡大率を設定する。
-	m_pressAToStartSprite.SetScale(TEXT_SPRITE_SCALE);
+	m_pressBToStartSprite.SetScale(TEXT_SPRITE_SCALE);
 
 	return true;
 }
@@ -32,11 +32,11 @@ bool TitleSprite::Start()
 void TitleSprite::Update()
 {
 	// スプライトを更新する。
-	m_pressAToStartSprite.Update();
+	m_pressBToStartSprite.Update();
 }
 
 void TitleSprite::Render(RenderContext& rc)
 {
 	// スプライトを描画する。
-	m_pressAToStartSprite.Draw(rc);
+	m_pressBToStartSprite.Draw(rc);
 }

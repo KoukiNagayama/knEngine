@@ -438,8 +438,8 @@ void Enemy::ProcessScreamStateTransition()
 	m_chaseTime = MINIMUM_CHASE_TIME;
 	// ステートを追跡状態にする
 	m_enemyState = enEnemyState_Chase;
-	// 追跡の音を流す。
-	m_isPlayEscapeSound = true;
+	// 追跡しているように記録。
+	m_isChase = true;
 }
 
 void Enemy::ProcessChaseStateTransition()
@@ -465,7 +465,7 @@ void Enemy::ProcessChaseStateTransition()
 		// パスを検索する間隔をリセット
 		m_pathFindingTimer = PATH_FINDING_TIMER;
 		m_isMove = false;
-		m_isPlayEscapeSound = false;
+		m_isChase = false;
 
 	}
 
@@ -479,8 +479,8 @@ void Enemy::ProcessSurveyStateTransition()
 		m_chaseTime = MINIMUM_CHASE_TIME;
 		// 追跡を開始
 		m_enemyState = enEnemyState_Chase;
-		// 追跡の音を流す。
-		m_isPlayEscapeSound = true;
+		// 追跡する。
+		m_isChase = true;
 
 		m_isMove = true;
 	}

@@ -18,6 +18,7 @@ class GameTimeScreen;
 class GameOverEffect;
 class Score;
 class Result;
+class ScreenEffect;
 
 class Game : public IGameObject
 {
@@ -41,14 +42,6 @@ public:
 	bool IsInGame()
 	{
 		return m_gameState == enGameState_InGame;
-	}
-	/// <summary>
-	/// ゲームクリアしているか。
-	/// </summary>
-	/// <returns>ゲームクリアになっていればtrue。そうでなければfalse。</returns>
-	bool IsGameClearNow()
-	{
-		return m_gameState == enGameState_GameClear;
 	}
 	/// <summary>
 	/// ゲームオーバーしているか。
@@ -100,6 +93,10 @@ private:
 	/// </summary>
 	void ManageState();
 	/// <summary>
+	/// ステートごとの処理
+	/// </summary>
+	void ProcessByState();
+	/// <summary>
 	/// タイトルからのステート遷移処理
 	/// </summary>
 	void StateTransitionProccesingFromTitle();
@@ -143,13 +140,19 @@ private:
 	/// 逃走時の音量コントロール
 	/// </summary>
 	void EscapeSoundVolumeControl(bool fadeIn);
-
+	/// <summary>
+	/// エネミーが近いときの音の音量コントロール
+	/// </summary>
+	void CloseToEnemySoundVolumeControl();
+	/// <summary>
+	/// エネミーが近いときの音をフェードさせる。
+	/// </summary>
+	void FadeCloseToEnemySound();
 private:
 	enum EnGameState
 	{
 		enGameState_Title,			// タイトル
 		enGameState_InGame,			// インゲーム
-		enGameState_GameClear,		// ゲームクリア
 		enGameState_GameOver,		// ゲームオーバー
 		enGameState_GameEnd			// ゲームエンド
 	};	
@@ -180,5 +183,12 @@ private:
 	Result*						m_result = nullptr;						// リザルトクラス
 	SoundSource*				m_escapeSound = nullptr;				// 逃走時の音
 	float						m_escapeSoundVolume = 1.0f;				// 逃走時の音量
+	SoundSource*				m_closeToEnemySound = nullptr;
+	float						m_closeToEnemySoundVolume = 0.0f;
+	float						m_distanceToNearestEnemy = 0.0f;	
+	float						m_closeToEnemySoundMulVolume = 1.0f;
+	bool						m_isFadeInCloseToEnemySound = false;
+	bool						m_isFadeOutCloseToEnemySound = false;
+	ScreenEffect*				m_screenEffect = nullptr;
 };
 
