@@ -60,13 +60,13 @@ public:
 
 private:
 
-	bool m_isPlayEffect = false;		// ゲームオーバーエフェクト再生フラグ
+	bool m_isPlayEffect = false;					// ゲームオーバーエフェクト再生フラグ
 
-	Player* m_player = nullptr;
-	Enemy* m_enemy = nullptr;
-	GameCamera* m_gameCamera = nullptr;
-	SoundSource* m_catchSound = nullptr;
-	SoundSource* m_horrorSound = nullptr;
+	Player* m_player = nullptr;						// プレイヤー
+	Enemy* m_enemy = nullptr;						// エネミー
+	GameCamera* m_gameCamera = nullptr;				// ゲームカメラ
+	SoundSource* m_catchSound = nullptr;			// 捕獲の音源
+	SoundSource* m_horrorSound = nullptr;			// ホラーの音源
 
 	// ここから演出用メンバ変数
 	Vector3 m_cameraNextTarget = Vector3::Zero;		// 次フレームの注視点を保存しておく

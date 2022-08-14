@@ -62,7 +62,7 @@ private:
 	Vector3				m_position = Vector3::Zero;				// 座標
 	EdgeManagement*		m_edgeManagement = nullptr;				// 輪郭線を管理
 	SoundSource*		m_bellSound = nullptr;					// ベルの音			
-	float				m_availableAgainTimerPerSec = 0.0f;		// 再度使用可能になるタイマー
+	float				m_availableAgainTimer = 0.0f;		// 再度使用可能になるタイマー
 	bool				m_isRing = false;						// ベルの音が鳴っているか。
 };
 

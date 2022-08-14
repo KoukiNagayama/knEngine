@@ -161,11 +161,11 @@ namespace nsK2EngineLow {
 			int outlineType = 0
 		);
 		/// <summary>
-		/// GBuffer描画用のモデルを初期化
+		/// 準備パスへの描画用のモデルを初期化
 		/// </summary>
 		/// <param name="filePath">ファイルパス。</param>
 		/// <param name="enModelUpAxis">モデルの上方向。</param>
-		void InitModelOnRenderToGBuffer(const char* filePath,
+		void InitModelOnRenderToReservePass(const char* filePath,
 			EnModelUpAxis enModelUpAxis = enModelUpAxisZ
 		);
 		/// <summary>
@@ -175,7 +175,7 @@ namespace nsK2EngineLow {
 
 	private:
 		Model									m_forwardRenderModel;							// フォワードレンダリングで描画されるモデル
-		Model									m_renderToGBufferModel;							// RenderToGBufferで描画されるモデル
+		Model									m_renderToReserveModel;							// RenderToGBufferで描画されるモデル
 		Skeleton								m_skeleton;										// スケルトン
 		Animation								m_animation;									// アニメーション
 		AnimationClip*							m_animationClips;								// アニメーションクリップ

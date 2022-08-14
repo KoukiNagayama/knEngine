@@ -53,5 +53,6 @@ private:
 
 	bool m_drawFlag = true;				// •`‰æƒtƒ‰ƒO
 
+
 };
 

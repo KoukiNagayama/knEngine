@@ -103,6 +103,7 @@ bool Enemy::Start()
 	m_player = FindGO<Player>("player");
 	// ベルのインスタンスを検索。
 	m_bell = FindGO<Bell>("bell");
+	// ゲームを総括するオブジェクトのインスタンスを検索
 	m_game = FindGO<Game>("game");
 	// ナビゲーションメッシュの初期化。
 	m_nvmMesh.Init("Assets/nvm/stage2_mesh.tkn");

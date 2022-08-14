@@ -5,11 +5,17 @@
 
 namespace
 {
-	const float SPRITE_W = 1920.0f;				// スプライトの横幅
-	const float SPRITE_H = 1080.0f;				// スプライトの縦幅
-	const float INIT_MIN_DIST_TO_ENEMY = 10000.0f;
-	const float MAX_ALPHA_VALUE = 1.0f;
-	const float MAX_RANGE_TO_ENEMY = 1500.0f;	// エネミーとの最大距離
+	const float SPRITE_W = 1920.0f;					// スプライトの横幅
+	const float SPRITE_H = 1080.0f;					// スプライトの縦幅
+	const float INIT_MIN_DIST_TO_ENEMY = 10000.0f;	// エネミーとの最短距離の初期化値
+	const float MAX_ALPHA_VALUE = 1.0f;				// α値の最大値
+	const float MIN_ALPHA_VALUE = 0.0f;				// α値の最小値
+	const float MAX_RANGE_TO_ENEMY = 1500.0f;		// エネミーとの最大距離
+	const int IDENTIFICATION_OF_ENEMY1 = 0;			// エネミー1の識別する値
+	const int IDENTIFICATION_OF_ENEMY2 = 1;			// エネミー2の識別する値
+	const float MULTIPLY_FADE_OUT = 0.3f;			// フェードアウトに乗算する値
+	const float RGB_VALUE = 1.0f;					// RGBの値
+
 }
 
 bool ScreenEffect::Start()
@@ -26,10 +32,10 @@ bool ScreenEffect::Start()
 	// エネミーのオブジェクトのアドレスを振り分ける。
 	for (int i = 0; i < size; i++) {
 		switch (i) {
-		case 0:
+		case IDENTIFICATION_OF_ENEMY1:
 			m_enemy1 = enemys[i];
 			break;
-		case 1:
+		case IDENTIFICATION_OF_ENEMY2:
 			m_enemy2 = enemys[i];
 			break;
 		}
@@ -58,9 +64,6 @@ void ScreenEffect::Update()
 
 void ScreenEffect::ChangeAlphaValue()
 {
-	// α値を初期化する。
-	//m_currentAlpha = 0.0f;
-
 	// プレイヤーの座標を取得
 	m_playerPos = m_player->GetPosition();
 
@@ -111,7 +114,7 @@ void ScreenEffect::ManageState()
 		// フェードイン。
 		FadeIn();
 		// α値に乗算する値が1.0を超えたならば。
-		if (m_alphaValueMultiplier >= 1.0f) {
+		if (m_alphaValueMultiplier >= MAX_ALPHA_VALUE) {
 			// 値を固定する。
 			m_enScreenEffectState = enState_Fix;
 		}
@@ -127,7 +130,7 @@ void ScreenEffect::ManageState()
 		// フェードアウト。
 		FadeOut();
 		// α値に乗算する値が0.0以下になったならば。
-		if (m_alphaValueMultiplier <= 0.0f) {
+		if (m_alphaValueMultiplier <= MIN_ALPHA_VALUE) {
 			m_enScreenEffectState = enState_Idle;
 		}
 		break;
@@ -147,13 +150,13 @@ void ScreenEffect::FadeIn()
 
 void ScreenEffect::FadeOut()
 {
-	m_alphaValueMultiplier -= 0.3 * g_gameTime->GetFrameDeltaTime();
+	m_alphaValueMultiplier -= MULTIPLY_FADE_OUT * g_gameTime->GetFrameDeltaTime();
 }
 
 void ScreenEffect::Render(RenderContext& rc)
 {
 	// α値を乗算。
-	m_screenEffect.SetMulColor({ 1.0f,1.0f,1.0f,m_currentAlpha });
+	m_screenEffect.SetMulColor({ RGB_VALUE,RGB_VALUE,RGB_VALUE,m_currentAlpha });
 	// 描画。
 	m_screenEffect.Draw(rc);
 }

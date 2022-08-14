@@ -95,6 +95,14 @@ private:
 	/// </summary>
 	void CalcRateOfEnemyScream2();
 	/// <summary>
+	/// エネミー3の足音の影響率を計算。
+	/// </summary>
+	void CalcRateOfEnemyFootstep3();
+	/// <summary>
+	/// エネミー3の咆哮の影響率を計算。
+	/// </summary>
+	void CalcRateOfEnemyScream3();
+	/// <summary>
 	/// ベルの音が鳴っているか指定。
 	/// </summary>
 	void SpecifyIsBellSounding();
@@ -118,6 +126,14 @@ private:
 	/// エネミー2の咆哮が鳴っているか指定。
 	/// </summary>
 	void SpecifyIsEnemyScream2Sounding();
+	/// <summary>
+	/// エネミー3の足音が鳴っているか指定。
+	/// </summary>
+	void SpecifyIsEnemyFootstep3Sounding();
+	/// <summary>
+	/// エネミー2の咆哮が鳴っているか指定。
+	/// </summary>
+	void SpecifyIsEnemyScream3Sounding();
 private:
 	enum EnSoundSourceData
 	{
@@ -126,9 +142,10 @@ private:
 		enSoundSourceData_EnemyFootstep1,	// エネミー1の足音
 		enSoundSourceData_EnemyScream1,		// エネミー1の咆哮
 		enSoundSourceData_Title,			// タイトル
-		//enSoundSourceData_BellAfterTitle,	// タイトルでのベル
 		enSoundSourceData_EnemyFootstep2,	// エネミー2の足音
 		enSoundSourceData_EnemyScream2,		// エネミー2の咆哮
+		enSoundSourceData_EnemyFootstep3,	// エネミー3の足音
+		enSoundSourceData_EnemyScream3,		// エネミー3の咆哮
 		enSoundSourceData_Num				// 音の個数
 	};
 
@@ -138,6 +155,7 @@ private:
 	Player*					m_player = nullptr;										// プレイヤー
 	Enemy*					m_enemy1 = nullptr;										// エネミー1
 	Enemy*					m_enemy2 = nullptr;										// エネミー2
+	Enemy*					m_enemy3 = nullptr;										// エネミー3
 	TitleCamera*			m_titleCamera = nullptr;								// タイトルカメラ
 	float					m_rateByTimeOfBell = 0.0f;								// ベルの時間経過による影響率
 	bool					m_isRateUpOfBell = false;								// ベルの影響率を上げるか
@@ -153,13 +171,18 @@ private:
 	bool					m_isLastEnemyScream = false;							// エネミーの咆哮は直前は鳴っていたか
 	Vector3					m_positionOfCenterInTitle = Vector3::Zero;				// タイトルの時の中心の座標
 	Game*					m_game = nullptr;										// ゲーム
-	float					m_rateByTimeOfBellAfterTitle = 1.0f;
-	float					m_rateByTimeOfEnemyFootstep2 = 0.0f;
-	bool					m_isRateUpOfEnemyFootstep2 = false;
-	bool					m_isLastEnemyFootstep2Sound = false;
+	float					m_rateByTimeOfBellAfterTitle = 1.0f;					// タイトル後のベルの時間経過による影響率
+	float					m_rateByTimeOfEnemyFootstep2 = 0.0f;					// エネミー2の足音の時間経過による影響率
+	bool					m_isRateUpOfEnemyFootstep2 = false;						// エネミー2の足音の影響率を上げるか
+	bool					m_isLastEnemyFootstep2Sound = false;					// エネミー2の足音は直前は鳴っていたか
 	float					m_rateByTimeOfEnemyScream2 = 0.0f;						// エネミー2の咆哮の時間経過による影響率
 	bool					m_isRateUpOfEnemyScream2 = false;						// エネミー2の咆哮の影響率を上げるか
 	bool					m_isLastEnemyScream2 = false;							// エネミー2の咆哮は直前は鳴っていたか
-
+	float					m_rateByTimeOfEnemyFootstep3 = 0.0f;					// エネミー3の足音の時間経過による影響率
+	bool					m_isRateUpOfEnemyFootstep3 = false;						// エネミー3の足音の影響率を上げるか
+	bool					m_isLastEnemyFootstep3Sound = false;					// エネミー3の足音は直前は鳴っていたか
+	float					m_rateByTimeOfEnemyScream3 = 0.0f;						// エネミー2の咆哮の時間経過による影響率
+	bool					m_isRateUpOfEnemyScream3 = false;						// エネミー2の咆哮の影響率を上げるか
+	bool					m_isLastEnemyScream3 = false;							// エネミー2の咆哮は直前は鳴っていたか
 };
 

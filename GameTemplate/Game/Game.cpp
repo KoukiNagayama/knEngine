@@ -16,21 +16,30 @@
 #include "Result.h"
 #include "sound/SoundEngine.h"
 #include "ScreenEffect.h"
+#include "Fade.h"
 
 namespace
 {
-	const int SETTING_TIME_3_MIN_PER_SEC = 180.0f;				// 秒ごとで制限時間を3分に設定。
-	const int SETTING_TIME_6_MIN_PER_SEC = 360.0f;				// 秒ごとで制限時間を5分に設定。	
-	const int GAME_END_TIME_PER_FRAME = 0.0f;					// フレームごとでゲームが終了する時間
+	const int PLAYABLE_TIME_PER_SEC = 10.0f;					// 秒ごとで制限時間を3分に設定。
+	const int GAME_END_TIME_PER_SEC = 0.0f;						// 秒ごとでゲームが終了する時間
 	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;				// ベルを取得した音の登録番号
 	const int ESCAPE_SOUND_NUMBER_TO_REGISTER = 10;				// 逃走時の音の登録番号
-	const float SOUND_VOLUME_MULTIPLIER = 0.3f;				// 逃走時の音の乗算する値
+	const float SOUND_VOLUME_MULTIPLIER = 0.3f;					// 逃走時の音の乗算する値
 	const float MAX_SOUND_VOLUME = 1.0f;						// 最大音量
 	const float MIN_SOUND_VOLUME = 0.0f;						// 最小音量
-	const float MAX_SOUND_MUL_VOLUME = 0.7f;
-	const float MIN_SOUND_MUL_VOLUME = 0.0f;
+	const float MAX_SOUND_MUL_VOLUME = 0.7f;					// 音量に乗算する最大値
+	const float MIN_SOUND_MUL_VOLUME = 0.0f;					// 音量に乗算する最小値
 	const float CLOSE_TO_ENEMY_SOUND_NUMBER_TO_REGISTER = 11;	// 敵が近くなった時の音の登録番号
 	const float CLOSE_TO_ENEMY_SOUND_RANGE = 2000.0f;			// 敵が近くなった時に聴こえる音の範囲
+	const int GAME_TIME_SCREEN_PRIORITY = 10;					// 残り時間表示オブジェクトの描画の優先順位(遅め)
+	const int SCORE_SCREEN_PRIORITY = 11;						// スコア表示オブジェクトの描画の優先順位(遅め)
+	const int GENERAL_PRIORITY = 0;								// 汎用的なオブジェクトの描画の優先順位(早め)
+	const int FADE_PRIORITY = 12;								// フェードのオブジェクトの描画の優先順位(一番遅い)
+	const float FADE_SPEED_TITLE_TO_IN_GAME = 0.75f;			// タイトルからインゲームに遷移するフェードのスピード
+	const float FADE_SPEED_IN_GAME_TO_RESULT = 1.4f;			// インゲームからリザルトに遷移するフェードのスピード
+	const float FADE_SPEED_RESULT_TO_TITLE = 1.0f;				// リザルトからタイトルに遷移するフェードのスピード
+	const int RESET_SCORE = 0;									// スコアのリセット
+	const int RESET_HIGHSCORE = 0;								// ハイスコアのリセット
 }
 
 bool Game::Start()
@@ -44,7 +53,7 @@ bool Game::Start()
 	g_soundEngine->ResistWaveFileBank(CLOSE_TO_ENEMY_SOUND_NUMBER_TO_REGISTER, "Assets/sound/normal_00.wav");
 
 	// 残り時間を表示するオブジェクトを作成（前面に出すため描画順番遅め）
-	m_gameTimeScreen = NewGO<GameTimeScreen>(10, "gameTimeScreen");
+	m_gameTimeScreen = NewGO<GameTimeScreen>(GAME_TIME_SCREEN_PRIORITY, "gameTimeScreen");
 	// 無を描画しないように初期化
 	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
 
@@ -52,8 +61,7 @@ bool Game::Start()
 	m_gameOverEffect = new GameOverEffect;
 
 	// スコアを表示する
-	m_scoreScreen = NewGO<Score>(11, "score");
-
+	m_scoreScreen = NewGO<Score>(SCORE_SCREEN_PRIORITY, "score");
 	// 表示するスコアを更新。
 	m_scoreScreen->ScoreUpdate();
 	m_scoreScreen->HighScoreUpdate();
@@ -112,54 +120,82 @@ void Game::ProcessByState()
 		if (m_gameOverEffect->IsPlayEffect()) {
 			m_gameOverEffect->PlayGameOverEffect();
 		}
-		//CloseToEnemySoundVolumeControl();
 		break;
 	case enGameState_GameOver:
 		// タイマーを進める。
 		GameTimer();
 		break;
 	case enGameState_GameEnd:
-		GameTimer();
+		//GameTimer();
 		break;
 	}
 }
 
 void Game::StateTransitionProccesingFromTitle()
 {
-	if (g_pad[0]->IsTrigger(enButtonB)) {
-		// タイトルのオブジェクトを削除する。
-		DeleteTitleObject();
-		m_edgeManagement.Clear();
-		// ゲームステートをインゲームに変更する。
-		m_gameState = enGameState_InGame;
-		// インゲームを初期化する。
-		InitInGame();
+	if (m_isWaitFadeout) {
+		if (!m_fade->IsFade()) {
+			//DeleteGO(m_fade);
+			// タイトルのオブジェクトを削除する。
+			DeleteTitleObject();
+			m_edgeManagement.Clear();
+			// ゲームステートをインゲームに変更する。
+			m_gameState = enGameState_InGame;
+			// インゲームを初期化する。
+			InitInGame();
+			// フェードインを開始する。
+			m_fade->StartFadeIn();
+			m_isWaitFadeout = false;
+		}
+	}
+	else {
+		if (g_pad[0]->IsTrigger(enButtonB)) {
+			m_isWaitFadeout = true;
+			// フェードアウトを開始する。
+			m_fade->StartFadeOut();
+			m_fade->SetFadeSpeed(FADE_SPEED_TITLE_TO_IN_GAME);
+		}
 	}
 }
 
 void Game::StateTransitionProccesingFromInGame()
 {
+	if (m_isWaitFadeout) {
+		// フェードが終わっているならば。
+		if (!m_fade->IsFade()) {
+			//DeleteGO(m_fade);
+			// ステートをゲームエンドに変更する。
+			m_gameState = enGameState_GameEnd;
+			// ハイスコアを求める。
+			if (m_highScore <= m_score) {
+				m_highScore = m_score;
+			}
+			// ゲームオブジェクトを全部削除する。
+			DeleteInGameObject();
+			// タイマーの描画を停止する。
+			m_gameTimeScreen->SetDrawFlag(false);
+			// リザルトを作成。
+			m_result = NewGO<Result>(GENERAL_PRIORITY, "result");
+			m_result->Init(m_highScore);
 
-	// 残り時間が無いならば。
-	if (m_remainingTime <= GAME_END_TIME_PER_FRAME) {
-		// ステートをゲームエンドに変更する。
-		m_gameState = enGameState_GameEnd;
-		// ハイスコアを求める。
-		if (m_highScore <= m_score) {
-			m_highScore = m_score;
+			// フェードインを開始する。
+			m_fade->StartFadeIn();
+			m_isWaitFadeout = false;
 		}
-		// ゲームオブジェクトを全部削除する。
-		DeleteInGameObject();
-		// タイマーの描画を停止する。
-		m_gameTimeScreen->SetDrawFlag(false);
-		// リザルトを作成。
-		m_result = NewGO<Result>(0, "result");
-		m_result->Init(m_highScore);
+	}
+	else {
+		// 残り時間がないならば。
+		if (m_remainingTime <= GAME_END_TIME_PER_SEC) {
+			m_isWaitFadeout = true;
+			// フェードアウトを開始する。
+			m_fade->StartFadeOut();
+			m_fade->SetFadeSpeed(FADE_SPEED_IN_GAME_TO_RESULT);
+		}
 	}
 
 	// ゲームオーバーになっていれば。
 	if (m_isGameOver) {
-		m_gameOver = NewGO<GameOver>(0, "gameOver");
+		m_gameOver = NewGO<GameOver>(GENERAL_PRIORITY, "gameOver");
 		// ステートをゲームオーバーに変更する。
 		m_gameState = enGameState_GameOver;
 		// ゲームオブジェクトを全部削除する。
@@ -185,7 +221,7 @@ void Game::StateTransitionProccesingFromGameOver()
 	}
 
 	// スコアを初期化する。
-	m_score = 0;
+	m_score = RESET_SCORE;
 	
 	// ゲームオーバー時の処理が終了しているならば
 	if (m_gameOver->IsEndProcess()) {
@@ -200,39 +236,47 @@ void Game::StateTransitionProccesingFromGameOver()
 
 void Game::StateTransitionProccesingFromGameEnd()
 {
-	m_edgeManagement.Clear();
+	if (m_isWaitFadeout) {
+		if (!m_fade->IsFade()) {
+			//DeleteGO(m_fade);
+			// リザルトを削除。
+			DeleteGO(m_result);
+			// ゲームステートをタイトルに変更する。
+			m_gameState = enGameState_Title;
+			// タイトル準備。
+			StartTitle();
+			// タイマーの描画を再開する。
+			m_gameTimeScreen->SetDrawFlag(true);
+			// 残り時間を渡す
+			m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
+			// リセットしておく
+			m_isResultDisplayFinished = false;
+			m_gameTimeScreen->Reset();
+			m_score = RESET_SCORE;
+			m_highScore = RESET_HIGHSCORE;
 
-	if (g_pad[0]->IsTrigger(enButtonA)) {
-		m_isResultDisplayFinished = true;
+			// フェードインを開始する。
+			m_fade->StartFadeIn();
+			m_fade->SetFadeSpeed(FADE_SPEED_RESULT_TO_TITLE);
+			m_isWaitFadeout = false;
+
+		}
 	}
-
-	// リザルトの表示が終了しているならば
-	if (m_isResultDisplayFinished) {
-		// リザルトを削除。
-		DeleteGO(m_result);
-		// ゲームステートをタイトルに変更する。
-		m_gameState = enGameState_Title;
-		// タイトル準備。
-		StartTitle();
-		// タイマーの描画を再開する。
-		m_gameTimeScreen->SetDrawFlag(true);
-		// 残り時間を渡す
-		m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
-		// リセットしておく
-		m_isResultDisplayFinished = false;
-		m_gameTimeScreen->Reset();
-		m_score = 0;
-		m_highScore = 0;
+	else {
+		if (g_pad[0]->IsTrigger(enButtonA)) {
+			m_isWaitFadeout = true;
+			m_fade->StartFadeOut();
+		}
 	}
 }
 
 void Game::InitInGame()
 {
-	m_inGameLevel.Init("Assets/level3D/stage2_2.tkl", [&](LevelObjectData& objData) {
+	m_inGameLevel.Init("Assets/level3D/stage2_3.tkl", [&](LevelObjectData& objData) {
 		//ステージ
 		if (objData.EqualObjectName(L"stage") == true) {
 			// 背景クラス
-			m_inGameStage = NewGO<BackGround>(0, "backGround");
+			m_inGameStage = NewGO<BackGround>(GENERAL_PRIORITY, "backGround");
 			m_inGameStage->SetPosition(objData.position);
 			m_inGameStage->SetEdgeManagement(&m_edgeManagement);
 			return true;
@@ -240,20 +284,20 @@ void Game::InitInGame()
 		//プレイヤー(カメラ)
 		if (objData.EqualObjectName(L"player") == true) {
 			// プレイヤークラス
-			m_player = NewGO<Player>(0, "player");
+			m_player = NewGO<Player>(GENERAL_PRIORITY, "player");
 			m_player->SetPosition(objData.position);
 			// ゲームカメラクラス
 			m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
 			m_gameCamera->SetPosition(objData.position);
 
-			m_bell = NewGO<Bell>(0, "bell");
+			m_bell = NewGO<Bell>(GENERAL_PRIORITY, "bell");
 			m_bell->SetEdgeManagement(&m_edgeManagement);
 			return true;
 		}
 		// エネミー
 		if (objData.ForwardMatchName(L"enemy") == true)
 		{
-			m_enemy = NewGO<Enemy>(0, "enemy");
+			m_enemy = NewGO<Enemy>(GENERAL_PRIORITY, "enemy");
 			m_enemy->SetPosition(objData.position);
 			m_enemy->SetNumber(objData.number);
 			m_enemy->SetEdgeManagement(&m_edgeManagement);
@@ -262,7 +306,7 @@ void Game::InitInGame()
 		// 収集アイテム
 		if (objData.EqualObjectName(L"collectItem") == true)
 		{
-			auto collectItem = NewGO<CollectItem>(0, "collectItem");
+			auto collectItem = NewGO<CollectItem>(GENERAL_PRIORITY, "collectItem");
 			collectItem->SetPosition(objData.position);
 			collectItem->SetEdgeManagement(&m_edgeManagement);
 			m_collectItem.push_back(collectItem);
@@ -274,22 +318,15 @@ void Game::InitInGame()
 	// 輪郭線制御情報の初期化
 	m_edgeManagement.Init();
 
-/*	m_closeToEnemySound = NewGO<SoundSource>(0);
-	m_closeToEnemySound->Init(CLOSE_TO_ENEMY_SOUND_NUMBER_TO_REGISTER);
-	m_closeToEnemySound->SetVolume(MAX_SOUND_VOLUME);
-	m_closeToEnemySound->Play(true);
-*/
-	//m_screenEffect = NewGO<ScreenEffect>(0, "screenEffect");
 
 	// ゲームオーバーエフェクトの初期化
 	m_gameOverEffect->Init(m_player, m_enemy, m_gameCamera);
-
 }
 
 void Game::DeleteInGameObject()
 {
 	// エネミー削除
-	// エネミーの情報
+	// エネミーの情報を検索。
 	auto& enemys = FindGOs<Enemy>("enemy");
 	// エネミーの数
 	int enemySize = enemys.size();
@@ -298,135 +335,93 @@ void Game::DeleteInGameObject()
 		// 削除
 		DeleteGO(m_enemy);
 	}
-
 	// ゲームカメラ削除
-	auto& gameCameras = FindGOs<GameCamera>("gameCamera");
-	int gameCameraSize = gameCameras.size();
-	for (int i = 0; i < gameCameraSize; i++) {
-		m_gameCamera = gameCameras[i];
-		DeleteGO(m_gameCamera);
-	}
-
+	DeleteGO(m_gameCamera);
+	// 収集アイテム削除
 	for (auto collectItem : m_collectItem)
 	{
 		DeleteGO(collectItem);
 	}
 	m_collectItem.clear();
-
-	auto& bells = FindGOs<Bell>("bell");
-	int bellSize = bells.size();
-	for (int i = 0; i < bellSize; i++) {
-		m_bell = bells[i];
-		DeleteGO(m_bell);
-	}
-
-	auto& players = FindGOs<Player>("player");
-	int playerSize = players.size();
-	for (int i = 0; i < playerSize; i++) {
-		m_player = players[i];
-		DeleteGO(m_player);
-	}
-
-	auto& inGameStages = FindGOs<BackGround>("backGround");
-	int stageSize = inGameStages.size();
-	for (int i = 0; i < stageSize; i++) {
-		m_inGameStage = inGameStages[i];
-		DeleteGO(m_inGameStage);
-	}
-
-	DeleteGO(m_closeToEnemySound);
-
-	//DeleteGO(m_screenEffect);
+	// ベル削除
+	DeleteGO(m_bell);
+	// プレイヤー削除
+	DeleteGO(m_player);
+	// ステージ削除
+	DeleteGO(m_inGameStage);
 
 }
 
 void Game::DeleteTitleObject()
 {
 	// タイトルカメラ削除
-	// タイトルカメラを検索
-	auto& titleCameras = FindGOs<TitleCamera>("titleCamera");
-	// タイトルカメラの数
-	int titleCameraSize = titleCameras.size();
-	for (int i = 0; i < titleCameraSize; i++) {
-		m_titleCamera = titleCameras[i];
-		// 削除
-		DeleteGO(m_titleCamera);
-	}
-
-
+	DeleteGO(m_titleCamera);
 	// タイトルテキスト削除
-	// タイトルテキストを検索
-	auto& titleTexts = FindGOs<TitleText>("titleText");
-	// タイトルテキストの数
-	int titleTextSize = titleTexts.size();
-	for (int i = 0; i < titleTextSize; i++) {
-		m_titleText = titleTexts[i];
-		// 削除
-		DeleteGO(m_titleText);
-	}
-
+	DeleteGO(m_titleText);
 	// ステージ削除
-	// ステージを検索
-	auto& inGameStages = FindGOs<BackGround>("backGround");
-	// ステージの数
-	int stageSize = inGameStages.size();
-	for (int i = 0; i < stageSize; i++) {
-		m_inGameStage = inGameStages[i];
-		// 削除
-		DeleteGO(m_inGameStage);
-	}
-	
+	DeleteGO(m_inGameStage);
 	// タイトルにあるスプライトを削除
 	DeleteGO(m_titleSprite);
 }
 
 void Game::GameTimer()
 {
-
 	// 残り時間を計算。
 	m_remainingTime -= g_gameTime->GetFrameDeltaTime();
 	
 	// 残り時間を渡す
 	m_gameTimeScreen->GameTimerUpdate(m_remainingTime);
-
 }
 
-void Game::StartGameOverEffect() {
+void Game::StartGameOverEffect() 
+{
+	// ゲームオーバーエフェクトを開始
 	m_gameOverEffect->StartGameOverEffect();
 }
 
 void Game::StartTitle() {
 
 	// 時間を設定。
-	m_remainingTime = SETTING_TIME_3_MIN_PER_SEC;
+	m_remainingTime = PLAYABLE_TIME_PER_SEC;
 
+	// 各オブジェクトを生成する。
+	// タイトルのレベルを初期化。
 	m_titleLevel.Init("Assets/level3D/title.tkl", [&](LevelObjectData& objData)
 		{
 			// タイトルモデル
 			if (objData.EqualObjectName(L"titleText") == true) {
-				m_titleText = NewGO<TitleText>(0, "titleText");
+				m_titleText = NewGO<TitleText>(GENERAL_PRIORITY, "titleText");
 				m_titleText->SetPosition(objData.position);
 				m_titleText->SetEdgeManagement(&m_edgeManagement);
 				return true;
 			}
 			// タイトル用カメラ
 			if (objData.EqualObjectName(L"titleCamera") == true) {
-				m_titleCamera = NewGO<TitleCamera>(0, "titleCamera");
+				m_titleCamera = NewGO<TitleCamera>(GENERAL_PRIORITY, "titleCamera");
 				m_titleCamera->SetPosition(objData.position);
 				return true;
 			}
 			// 背景
 			if (objData.EqualObjectName(L"stage2") == true) {
-				m_inGameStage = NewGO<BackGround>(0, "backGround");
+				m_inGameStage = NewGO<BackGround>(GENERAL_PRIORITY, "backGround");
 				m_inGameStage->SetPosition(objData.position);
 				m_inGameStage->SetEdgeManagement(&m_edgeManagement);
 				return true;
 			}
 		});
-	m_titleSprite = NewGO<TitleSprite>(0, "titleSprite");
+	// タイトル時に表示するスプライトを生成する。
+	m_titleSprite = NewGO<TitleSprite>(GENERAL_PRIORITY, "titleSprite");
 
-	// 輪郭線情報を初期化。
+	// 輪郭線情報を初期化する。
 	m_edgeManagement.Init();
+
+	// フェードのオブジェクトが既に生成されているならば削除する。
+	if (m_fade == nullptr) {
+		m_fade = NewGO<Fade>(FADE_PRIORITY, "fade");
+	}
+
+	// フェードインを開始
+	m_fade->StartFadeIn();
 }
 
 void Game::PlayEscapeSound()
@@ -500,83 +495,4 @@ void Game::EscapeSoundVolumeControl(bool fadeIn)
 	m_escapeSound->SetVolume(m_escapeSoundVolume);
 }
 
-void Game::FadeCloseToEnemySound()
-{
-	// フェードインするならば。
-	if (m_isFadeInCloseToEnemySound) {
-		// ボリュームに乗算する値を増加させる。
-		m_closeToEnemySoundMulVolume += g_gameTime->GetFrameDeltaTime();
-		// 最大値を超えないように固定する。
-		if (m_closeToEnemySoundMulVolume >= MAX_SOUND_MUL_VOLUME) {
-			m_closeToEnemySoundMulVolume = MAX_SOUND_MUL_VOLUME;
-			m_isFadeInCloseToEnemySound = false;
-		}
-		return;
-	}
-	// フェードアウトするならば。
-	else if (m_isFadeOutCloseToEnemySound) {
-		// ボリュームに乗算する値を減少させる。
-		m_closeToEnemySoundMulVolume -= g_gameTime->GetFrameDeltaTime();
-		// 最小値を超えないように固定する。
-		if (m_closeToEnemySoundMulVolume <= MIN_SOUND_MUL_VOLUME) {
-			m_closeToEnemySoundMulVolume = MIN_SOUND_MUL_VOLUME;
-			m_isFadeOutCloseToEnemySound = false;
-		}
-		return;
-	}
 
-
-	// 逃走時の音が鳴っていなければ。
-	if (m_escapeSound == nullptr) {
-		// フェードインさせる。
-		m_isFadeInCloseToEnemySound = true;
-	}
-	// 鳴っていれば。
-	else {
-		// フェードアウトさせる。
-		m_isFadeOutCloseToEnemySound = true;
-	}
-}
-
-void Game::CloseToEnemySoundVolumeControl()
-{
-	// 一番近いエネミーとの距離を初期化する。
-	m_distanceToNearestEnemy = 0.0f;
-	// プレイヤーの座標。
-	Vector3 playerPos = m_player->GetPosition();
-
-	// エネミーを検索
-	const auto& enemys = FindGOs<Enemy>("enemy");
-	// エネミーの数
-	const int size = enemys.size();
-
-	for (int i = 0; i < size; i++) {
-		m_enemy = enemys[i];
-		// エネミーの座標。
-		Vector3 enemyPos = m_enemy->GetPosition();
-		// エネミーとプレイヤーの距離。
-		Vector3 diff = playerPos - enemyPos;
-		// 一番近いエネミーとの距離を調べる。
-		if (m_distanceToNearestEnemy == 0.0f || diff.Length() <= m_distanceToNearestEnemy) {
-			m_distanceToNearestEnemy = diff.Length();
-		}
-	}
-	// ボリュームを計算する。
-	//m_closeToEnemySoundVolume = MAX_SOUND_VOLUME - (m_distanceToNearestEnemy / CLOSE_TO_ENEMY_SOUND_RANGE * MAX_SOUND_VOLUME);
-	
-	m_closeToEnemySoundVolume = 0.0f;
-	
-	// 最小音量未満にならないように固定する。
-	if (m_closeToEnemySoundVolume <= MIN_SOUND_VOLUME) {
-		m_closeToEnemySoundVolume = MIN_SOUND_VOLUME;
-	}
-
-	// 乗算する値を求める。
-	FadeCloseToEnemySound();
-
-	// 乗算してフェードをさせる。
-	m_closeToEnemySoundVolume *= m_closeToEnemySoundMulVolume;
-
-	// ボリュームを設定。
-	m_closeToEnemySound->SetVolume(m_closeToEnemySoundVolume);
-}

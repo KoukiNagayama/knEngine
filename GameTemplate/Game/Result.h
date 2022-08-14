@@ -1,4 +1,5 @@
 #pragma once
+class Fade;
 class Result : public IGameObject
 {
 public:
@@ -29,6 +30,7 @@ private:
 	int						m_score = 0;					// スコア
 	int						m_numberNum = -1;				// 数字の数（最初に計算）
 	bool					m_initFlag = false;				// 初期化フラグ
+	Fade*					m_fade = nullptr;
 
 };
 

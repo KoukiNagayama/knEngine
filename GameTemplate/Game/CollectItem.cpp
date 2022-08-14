@@ -22,6 +22,7 @@ namespace
 	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;					// ベルを取得した音の登録番号
 	const float PICK_UP_BELL_VOLUME = 1.0f;							// ベルを取得した際の音の音量
 	const float ADD_ROTATION_PER_FRAME = 1.5f;						// フレームごとに回転を増加させる値
+	const int PICK_UP_BELL_SOUND_PRIORITY = 0;						// ベルを取得した際の音源のオブジェクトの実行優先順位
 }
 
 bool CollectItem::Start()
@@ -70,9 +71,6 @@ void CollectItem::Update()
 	// アイテムを取得。
 	RetrieveItem();
 
-	// 色を変更するか調べる。
-	//CheckChangeColor();
-
 	// 座標を設定。
 	m_itemModel.SetPosition(m_position);
 
@@ -112,66 +110,11 @@ void CollectItem::RetrieveItem()
 		// 再び描画されるまでのタイマーをリセット。
 		m_drawAgainTimerPerSec = TIME_TO_DRAW_AGAIN_PER_SEC;
 
-		m_pickUpBellSound = NewGO<SoundSource>(0);
+		m_pickUpBellSound = NewGO<SoundSource>(PICK_UP_BELL_SOUND_PRIORITY);
 		m_pickUpBellSound->Init(PICK_UP_BELL_NUMBER_TO_REGISTER);
 		m_pickUpBellSound->SetVolume(PICK_UP_BELL_VOLUME);
 		m_pickUpBellSound->Play(false);
 	}
-}
-
-void CollectItem::CheckChangeColor()
-{
-	// プレイヤーとの距離を調べる。
-	CheckDistanceToPlayer();
-
-	// プレイヤーがベルを鳴らしているか。
-	bool isBellRing = m_bell->IsBellRinging();
-
-	// 現在の色が黄ならば色を白に戻すためのタイマーを進める。
-	if (m_currentColor == EDGE_COLOR_YELLOW) {
-		m_resetColorTimerPerSec -= g_gameTime->GetFrameDeltaTime();
-	}
-
-	// プレイヤーがベルを鳴らしている時に距離が近く、現在の色が白ならば。
-	if (m_distToPlayer.Length() < COLOR_CHANGE_DISTANCE_TO_PLAYER 
-		&& m_currentColor == EDGE_COLOR_WHITE
-		&& isBellRing == true
-		) 
-	{
-		// モデルを初期化する。(輪郭線の色は黄)
-		m_itemModel.Init(
-			"Assets/modelData/item/bell.tkm",
-			nullptr,
-			NUM_ANIMATIONCLIP,
-			enModelUpAxisZ,
-			MAX_INSTANCE,
-			EDGE_COLOR_YELLOW,
-			m_edgeManagement->GetEdgeControl()
-		);
-		// 現在の色を保持する。
-		m_currentColor = EDGE_COLOR_YELLOW;
-		// 色をリセットするタイマーを初期化する。
-		m_resetColorTimerPerSec = 5.0f;
-
-	}
-	// プレイヤーとの距離が遠く、現在の色が黄ならば。
-	else if (m_currentColor == EDGE_COLOR_YELLOW
-		&& m_resetColorTimerPerSec <= 0.0f
-		)
-	{
-		// モデルを初期化する。(輪郭線の色は白)
-		m_itemModel.Init(
-			"Assets/modelData/item/bell.tkm",
-			nullptr,
-			NUM_ANIMATIONCLIP,
-			enModelUpAxisZ,
-			MAX_INSTANCE,
-			EDGE_COLOR_WHITE,
-			m_edgeManagement->GetEdgeControl()
-		);
-		m_currentColor = EDGE_COLOR_WHITE;
-	}
-	
 }
 
 void CollectItem::CountAppearsAgain()

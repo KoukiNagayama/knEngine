@@ -14,7 +14,9 @@ namespace
 	const int	MAX_INSTANCE = 0;								// インスタンスの最大数
 	const int	BELL_SOUND_NUMBER_TO_REGISTER = 0;				// 登録するベルの音の番号
 	const float VOLUME = 1.0f;									// 音量
-	const float TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC = 3.0f;	// 再度使用可能になる時間
+	const float TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC = 3.0f;		// 再度使用可能になる時間
+	const float MIN_TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC = 0.0f;	// 再度使用可能になる時間の最小値
+	const int	BELL_SOUND_PRIORITY = 0;						// ベルの音源オブジェクトの実行優先順位
 }
 
 Bell::~Bell()
@@ -91,12 +93,15 @@ void Bell::MoveWithPlayer()
 void Bell::Ring()
 {
 	// タイマーを減らす。
-	m_availableAgainTimerPerSec -= g_gameTime->GetFrameDeltaTime();
+	m_availableAgainTimer -= g_gameTime->GetFrameDeltaTime();
 
 	// Bボタンを押したときにタイマーが0になっていれば
-	if (g_pad[0]->IsTrigger(enButtonB) && m_availableAgainTimerPerSec <= 0.0f) {
+	if (g_pad[0]->IsTrigger(enButtonB) 
+		&& m_availableAgainTimer <= MIN_TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC
+		) 
+	{
 		// 音源を鳴らす。
-		m_bellSound = NewGO<SoundSource>(0);
+		m_bellSound = NewGO<SoundSource>(BELL_SOUND_PRIORITY);
 		m_bellSound->Init(BELL_SOUND_NUMBER_TO_REGISTER);
 		m_bellSound->SetVolume(VOLUME);
 		m_bellSound->Play(false);
@@ -104,7 +109,7 @@ void Bell::Ring()
 		// 鳴っている。
 		m_isRing = true;
 		// タイマーを再度初期化。
-		m_availableAgainTimerPerSec = TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC;
+		m_availableAgainTimer = TIME_TO_BE_AVAILABLE_AGAIN_PER_SEC;
 		return;
 	}
 

@@ -12,6 +12,10 @@ namespace
 	const Vector3 HIGHSCORE_SPRITE_POSITION = { 480.0f,330.0f,0.0f };		// HIGHSCOREのスプライトの座標
 	const Vector2 SCORE_AND_HIGHSCORE_SPRITE_SIZE = { 512.0f,512.0f };		// SCOREとHIGHSCOREのスプライトの画像サイズ
 	const Vector3 SCORE_AND_HIGHSCORE_SPRITE_SCALE = {1.0f,1.0f,1.0f};		// SCOREとHIGHSCOREのスプライトの拡大率
+	const int INIT_DIGIT_VALUE = 1;											// 桁を初期化
+	const int INIT_NUMBER_VALUE = 0;										// 求める数を初期化
+	const int DIGIT_EXTRACTION_VALUE = 10;									// 桁を抽出する値
+	const int 
 }
 
 Score::Score()
@@ -93,15 +97,15 @@ void Score::ScoreUpdate()
 	// intに変換しておく
 	int now_score = m_score;
 
-	int digit = 1;	// 初期化
-	int num = 0;
+	int digit = INIT_DIGIT_VALUE;	// 桁の初期化
+	int num = INIT_NUMBER_VALUE;	// 求める数値の初期化
 
 	// 数字の更新
 	for (int i = m_numberNum - 1; i >= 0; i--) {
 
 		// 一桁目から順番に各桁の値を抽出
-		num = (now_score / digit) % 10;
-		digit *= 10;
+		num = (now_score / digit) % DIGIT_EXTRACTION_VALUE;
+		digit *= DIGIT_EXTRACTION_VALUE;
 
 		switch (num)
 		{
@@ -147,15 +151,15 @@ void Score::HighScoreUpdate()
 	// intに変換しておく
 	int now_score = m_highScore;
 
-	int digit = 1;	// 初期化
-	int num = 0;
+	int digit = INIT_DIGIT_VALUE;	// 初期化
+	int num = INIT_NUMBER_VALUE;
 
 	// 数字の更新
 	for (int i = m_numberNum - 1; i >= 0; i--) {
 
 		// 一桁目から順番に各桁の値を抽出
-		num = (now_score / digit) % 10;
-		digit *= 10;
+		num = (now_score / digit) % DIGIT_EXTRACTION_VALUE;
+		digit *= DIGIT_EXTRACTION_VALUE;
 
 		switch (num)
 		{

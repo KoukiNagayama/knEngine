@@ -6,7 +6,7 @@ namespace nsK2EngineLow
 	void RenderingEngine::Init()
 	{
 		InitMainRenderTarget();
-		InitGBuffer();
+		InitReserveRenderTarget();
 		Init2DRenderTarget();
 		InitCopyMainRenderTargetToFrameBufferSprite();
 		m_bloom.Init(m_mainRenderTarget);
@@ -24,7 +24,7 @@ namespace nsK2EngineLow
 		);
 	}
 
-	void RenderingEngine::InitGBuffer()
+	void RenderingEngine::InitReserveRenderTarget()
 	{
 		// フレームバッファの縦幅
 		int frameBuffer_h = g_graphicsEngine->GetFrameBufferHeight();
@@ -32,7 +32,7 @@ namespace nsK2EngineLow
 		int frameBuffer_w = g_graphicsEngine->GetFrameBufferWidth();
 
 		// 深度値出力用のレンダリングターゲットを初期化する
-		m_gBuffer[enGBufferDepth].Create(
+		m_reserveRenderTarget[enReserveDepth].Create(
 			frameBuffer_w,
 			frameBuffer_h,
 			1,
@@ -42,7 +42,7 @@ namespace nsK2EngineLow
 		);
 
 		// 法線出力用のレンダリングターゲットを初期化する
-		m_gBuffer[enGBufferNormal].Create(
+		m_reserveRenderTarget[enReserveNormal].Create(
 			frameBuffer_w,
 			frameBuffer_h,
 			1,
@@ -54,7 +54,7 @@ namespace nsK2EngineLow
 		// レンダリングターゲットのテクスチャを埋める値 
 		float clearColor[4] = { 10000.0f, 10000.0f, 10000.0f, 1.0f };
 		// ワールド座標出力用のレンダリングターゲットを初期化する
-		m_gBuffer[enGBufferWorldPos].Create(
+		m_reserveRenderTarget[enReserveWorldPos].Create(
 			frameBuffer_w,
 			frameBuffer_h,
 			1,
@@ -128,8 +128,8 @@ namespace nsK2EngineLow
 	void RenderingEngine::Execute(RenderContext& rc)
 	{
 
-		// G-Bufferへのレンダリング
-		RenderToGBuffer(rc);
+		// 準備用パスへのレンダリング
+		RenderToReservePass(rc);
 
 		// 輪郭線の制御
 		m_edgeControl.Update();
@@ -148,17 +148,17 @@ namespace nsK2EngineLow
 
 
 		// 登録されているオブジェクトをクリア
-		m_renderToGBufferModels.clear();
+		m_renderToReservePassModels.clear();
 		m_forwardRenderModels.clear();
 		m_sprites.clear();
 	}
 
-	void RenderingEngine::RenderToGBuffer(RenderContext& rc)
+	void RenderingEngine::RenderToReservePass(RenderContext& rc)
 	{
-		RenderTarget* rts[enGBufferNum] = {
-			&m_gBuffer[enGBufferDepth],			// 0番目のレンダリングターゲット
-			&m_gBuffer[enGBufferNormal],		// 1番目のレンダリングターゲット
-			&m_gBuffer[enGBufferWorldPos]		// 2番目のレンダリングターゲット
+		RenderTarget* rts[enReserveNum] = {
+			&m_reserveRenderTarget[enReserveDepth],			// 0番目のレンダリングターゲット
+			& m_reserveRenderTarget[enReserveNormal],		// 1番目のレンダリングターゲット
+			& m_reserveRenderTarget[enReserveWorldPos]		// 2番目のレンダリングターゲット
 		};
 
 		// レンダリングターゲットとして利用可能になるまで待つ
@@ -168,7 +168,7 @@ namespace nsK2EngineLow
 		// レンダリングターゲットをクリアする
 		rc.ClearRenderTargetViews(ARRAYSIZE(rts), rts);
 
-		for (auto& model : m_renderToGBufferModels) {
+		for (auto& model : m_renderToReservePassModels) {
 			// モデルを描画
 			model->Draw(rc);
 		}
@@ -214,39 +214,6 @@ namespace nsK2EngineLow
 			// スプライトを描画
 			sprite->Draw(rc);
 		}
-
-		// 2D描画用レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);
-
-		// レンダリングターゲットとして利用できるまで待つ
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-
-		// レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-
-		m_2DSprite.Draw(rc);
-
-		// メインレンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
-	}
-
-	void RenderingEngine::RenderFont(RenderContext& rc)
-	{
-		// レンダリングターゲットとして利用できるまで待つ
-		rc.WaitUntilToPossibleSetRenderTarget(m_2DRenderTarget);
-
-		// レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_2DRenderTarget);
-
-		// レンダリングターゲットをクリア
-		rc.ClearRenderTargetView(m_2DRenderTarget);
-
-		m_mainSprite.Draw(rc);
-
-
-
-
-
 
 		// 2D描画用レンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_2DRenderTarget);

@@ -9,6 +9,7 @@ namespace
 
 	const int COLOR_CHANGE_BORDER = 30;									// 残り時間がこの値以下になったら色変更
 	const Vector4 COLOR_CHANGE = { 1.0f,0.0f,0.0f,1.0f };				// 残り時間が少ない時の色
+	const Vector4 COLOR_RESET = { 1.0f,1.0f,1.0f,1.0f };				// 残り時間の色をリセットするときの色
 }
 
 GameTimeScreen::GameTimeScreen() {
@@ -90,10 +91,20 @@ void GameTimeScreen::GameTimerUpdate(const float time) {
 	}
 
 	// 色の更新
+	// 時間があまりないとき白→赤に。
 	if (m_colorChangeFlag == false && now_time <= COLOR_CHANGE_BORDER) {
 		m_colorChangeFlag = true;
+		// 色を赤に変更する。
 		for (int i = 0; i < m_numberNum; i++) {
 			m_numberSprite[i].SetMulColor(COLOR_CHANGE);
+		}
+	}
+	// 時間に余裕があるとき赤→白に。
+	else if(m_colorChangeFlag == true && now_time > COLOR_CHANGE_BORDER) {
+		m_colorChangeFlag = false;
+		// 色を白に変更する。
+		for (int i = 0; i < m_numberNum; i++) {
+			m_numberSprite[i].SetMulColor(COLOR_RESET);
 		}
 	}
 }

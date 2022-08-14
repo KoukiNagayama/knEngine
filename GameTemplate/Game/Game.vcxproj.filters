@@ -5,9 +5,6 @@
     <ClCompile Include="Bell.cpp" />
     <ClCompile Include="CollectItem.cpp" />
     <ClCompile Include="EdgeManagement.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyPath.cpp" />
-    <ClCompile Include="EngineTest.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="GameOver.cpp" />
@@ -17,21 +14,52 @@
     <ClCompile Include="Score.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="system\system.cpp" />
-    <ClCompile Include="TitleCamera.cpp" />
-    <ClCompile Include="TitleSprite.cpp" />
-    <ClCompile Include="TitleText.cpp" />
     <ClCompile Include="GameOverEffect.cpp" />
     <ClCompile Include="Result.cpp" />
     <ClCompile Include="ScreenEffect.cpp" />
+    <ClCompile Include="Fade.cpp" />
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyPath.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleText.cpp">
+      <Filter>Title</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleSprite.cpp">
+      <Filter>Title</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleCamera.cpp">
+      <Filter>Title</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnemyState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyWalkState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyScreamState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAttackState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyChaseState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyReturnToPathState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemySurveyState.cpp">
+      <Filter>Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Bell.h" />
     <ClInclude Include="CollectItem.h" />
     <ClInclude Include="EdgeManagement.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyPath.h" />
-    <ClInclude Include="EngineTest.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="GameOver.h" />
@@ -41,14 +69,56 @@
     <ClInclude Include="Score.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
-    <ClInclude Include="TitleCamera.h" />
-    <ClInclude Include="TitleSprite.h" />
-    <ClInclude Include="TitleText.h" />
     <ClInclude Include="GameOverEffect.h" />
     <ClInclude Include="Result.h" />
     <ClInclude Include="ScreenEffect.h" />
+    <ClInclude Include="Fade.h" />
+    <ClInclude Include="Enemy.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyPath.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleText.h">
+      <Filter>Title</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleSprite.h">
+      <Filter>Title</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleCamera.h">
+      <Filter>Title</Filter>
+    </ClInclude>
+    <ClInclude Include="IEnemyState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyWalkState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyScreamState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAttackState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyChaseState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyReturnToPathState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemySurveyState.h">
+      <Filter>Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Enemy">
+      <UniqueIdentifier>{98c9b02b-4866-4bb4-8d4f-2b11237d3ada}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Title">
+      <UniqueIdentifier>{fefa5f48-4109-40b1-9b61-9ddadbb123ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

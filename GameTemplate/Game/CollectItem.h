@@ -54,10 +54,7 @@ private:
 	/// アイテムを取得する。
 	/// </summary>
 	void RetrieveItem();
-	/// <summary>
-	/// モデルの色を変更するか調べる。
-	/// </summary>
-	void CheckChangeColor();
+
 private:
 	ModelRender				m_itemModel;							// アイテムのモデル
 	Vector3					m_position = Vector3::Zero;				// 座標

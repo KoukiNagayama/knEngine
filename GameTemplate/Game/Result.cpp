@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Result.h"
+#include "Fade.h"
 
 namespace
 {

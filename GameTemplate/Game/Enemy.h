@@ -5,6 +5,7 @@
 #include "AI/PathFinding/NaviMesh.h"
 #include "AI/PathFinding/Path.h"
 #include "sound/SoundSource.h"
+#include "IEnemyState.h"
 
 
 class Player;
@@ -248,7 +249,7 @@ private:
 	Game*					m_game = nullptr;
 	bool					m_isChase = false;
 	float					m_screamEndTimer = 0.0f;					// 咆哮終了までのタイマー
-
+	IEnemyState*			m_iEnemyState = nullptr;
 
 };
 

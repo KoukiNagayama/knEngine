@@ -44,7 +44,8 @@ public:
 	/// 移動可能フラグを設定
 	/// </summary>
 	/// <param name="movable">移動可能かどうか</param>
-	void SetIsMovable(const bool movable) {
+	void SetIsMovable(const bool movable)
+	{
 		m_isMovable = movable;
 	}
 private:

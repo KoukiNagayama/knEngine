@@ -30,7 +30,13 @@ private:
 	/// ステート遷移
 	/// </summary>
 	void StateTransitionProccesing();
+	/// <summary>
+	/// フェードイン
+	/// </summary>
 	void FadeIn();
+	/// <summary>
+	/// フェードアウト
+	/// </summary>
 	void FadeOut();
 private:
 	enum EnScreenEffectState {
@@ -46,7 +52,7 @@ private:
 	float					m_shortestDistanceToEnemy = 10000.0f;		// エネミーとの最短距離
 	Vector3					m_playerPos;
 	Player*					m_player = nullptr;
-	EnScreenEffectState		m_enScreenEffectState = enState_Idle;
-	float					m_alphaValueMultiplier = 0.0f;
+	EnScreenEffectState		m_enScreenEffectState = enState_Idle;		// スクリーンエフェクトの
+	float					m_alphaValueMultiplier = 0.0f;				// 乗算するα値
 };
 

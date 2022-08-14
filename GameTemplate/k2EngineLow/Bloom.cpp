@@ -1,6 +1,13 @@
 #include "k2EngineLowPreCompile.h"
 #include "Bloom.h"
 
+namespace
+{
+	const int MIPMAP_LEVEL = 1;			// ミップマップレベル
+	const int TEXTURE_ARRAY_SIZE = 1;	// テクスチャ配列サイズ
+	const int BLUR_POWER = 10;			// ブラーの強さ
+}
+
 namespace nsK2EngineLow
 {
 	void Bloom::Init(RenderTarget& mainRenderTarget)
@@ -19,8 +26,8 @@ namespace nsK2EngineLow
 		m_luminanceRenderTarget.Create(
 			mainRenderTarget.GetWidth(),
 			mainRenderTarget.GetHeight(),
-			1,
-			1,
+			MIPMAP_LEVEL,
+			TEXTURE_ARRAY_SIZE,
 			mainRenderTarget.GetColorBufferFormat(),
 			DXGI_FORMAT_UNKNOWN
 		);
@@ -99,10 +106,10 @@ namespace nsK2EngineLow
 		rc.WaitUntilFinishDrawingToRenderTarget(m_luminanceRenderTarget);
 
 		// ガウシアンブラーを4回実行する
-		m_gaussianBlur[0].ExecuteOnGPU(rc, 10);
-		m_gaussianBlur[1].ExecuteOnGPU(rc, 10);
-		m_gaussianBlur[2].ExecuteOnGPU(rc, 10);
-		m_gaussianBlur[3].ExecuteOnGPU(rc, 10);
+		m_gaussianBlur[0].ExecuteOnGPU(rc, BLUR_POWER);
+		m_gaussianBlur[1].ExecuteOnGPU(rc, BLUR_POWER);
+		m_gaussianBlur[2].ExecuteOnGPU(rc, BLUR_POWER);
+		m_gaussianBlur[3].ExecuteOnGPU(rc, BLUR_POWER);
 
 		// 4枚のボケ画像を合成してメインレンダリングターゲットに加算合成
 		// レンダリングターゲットとして利用できるまで待つ

@@ -14,6 +14,8 @@ namespace
 	const float Y_AXIS_MOVING_AMOUNT = 0.0f;						// Y軸の移動量
 	const int	PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER = 1;		// 登録するプレイヤーの足音の番号
 	const float FOOTSTEP_VOLUME = 0.7f;								// 足音の音量
+	const float SPEED_OF_MOVING_JUDGE = 0.001f;						// 移動している判定用のスピード
+	const int PLAYER_FOOTSTEP_SOUND_PRIORITY = 0;					// 足音の音源オブジェクトのプライオリティ
 }
 
 Player::Player()
@@ -38,7 +40,7 @@ bool Player::Start()
 	
 	g_soundEngine->ResistWaveFileBank(PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER, "Assets/sound/walk.wav");
 
-	m_footstepSound = NewGO<SoundSource>(0);
+	m_footstepSound = NewGO<SoundSource>(PLAYER_FOOTSTEP_SOUND_PRIORITY);
 	m_footstepSound->Init(PLAYER_FOOTSTEP_SOUND_NUMBER_TO_REGISTER);
 	m_footstepSound->SetVolume(FOOTSTEP_VOLUME);
 	return true;
@@ -139,7 +141,9 @@ void Player::ManageState()
 
 void Player::ProcessCommonStateTransition()
 {
-	if (fabsf(m_moveSpeed.x) >= 0.001f || fabsf(m_moveSpeed.z) >= 0.001f)
+	if (fabsf(m_moveSpeed.x) >= SPEED_OF_MOVING_JUDGE 
+		|| fabsf(m_moveSpeed.z) >= SPEED_OF_MOVING_JUDGE
+		)
 	{
 		m_playerState = enPlayerState_Walk;
 	}

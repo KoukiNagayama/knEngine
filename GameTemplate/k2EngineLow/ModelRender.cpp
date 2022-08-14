@@ -23,7 +23,7 @@ namespace nsK2EngineLow
 		// フォワードレンダリング用のモデルを初期化。
 		InitForwardRenderingModel(filePath, enModelUpAxis, outlineType);
 		// GBuffer描画用のモデルを初期化
-		InitModelOnRenderToGBuffer(filePath, enModelUpAxis);
+		InitModelOnRenderToReservePass(filePath, enModelUpAxis);
 	}
 
 	void ModelRender::InitSkeleton(const char* filePath)
@@ -60,13 +60,13 @@ namespace nsK2EngineLow
 		modelInitData.m_tkmFilePath = filePath;
 		// シェーダーファイルのファイルパスを指定する。
 		if (outlineType == 0) {
-			modelInitData.m_fxFilePath = "Assets/shader/test.fx";
+			modelInitData.m_fxFilePath = "Assets/shader/forwardRenderForNormalModel.fx";
 		}
 		else if (outlineType == 1) {
 			modelInitData.m_fxFilePath = "Assets/shader/enemy.fx";
 		}
 		else if (outlineType == 2) {
-			modelInitData.m_fxFilePath = "Assets/shader/colorChangeOfBell.fx";
+			modelInitData.m_fxFilePath = "Assets/shader/collectItem.fx";
 		}
 		// エントリーポイントを指定する。
 		if (m_animationClips != nullptr) {
@@ -95,7 +95,7 @@ namespace nsK2EngineLow
 		m_forwardRenderModel.Init(modelInitData);
 	}
 
-	void ModelRender::InitModelOnRenderToGBuffer(const char* filePath,
+	void ModelRender::InitModelOnRenderToReservePass(const char* filePath,
 		EnModelUpAxis enModelUpAxis
 	)
 	{
@@ -103,7 +103,7 @@ namespace nsK2EngineLow
 		// モデルの上方向を指定する
 		modelInitData.m_modelUpAxis = enModelUpAxis;
 		// シェーダーファイルのファイルパスを指定する
-		modelInitData.m_fxFilePath = "Assets/shader/RenderToGBufferFor3DModel.fx";
+		modelInitData.m_fxFilePath = "Assets/shader/renderToReservePassForModel.fx";
 		// エントリーポイントを指定する。
 		if (m_animationClips != nullptr) {
 			//スケルトンを指定する。
@@ -118,7 +118,7 @@ namespace nsK2EngineLow
 		// tkmファイルのファイルパスを指定する
 		modelInitData.m_tkmFilePath = filePath;
 		// 初期化データをもとにモデルを初期化
-		m_renderToGBufferModel.Init(modelInitData);
+		m_renderToReserveModel.Init(modelInitData);
 	}
 	void ModelRender::UpdateInstancingData(const Vector3& pos, const Quaternion& rot, const Vector3& scale)
 	{
@@ -159,9 +159,9 @@ namespace nsK2EngineLow
 
 	void ModelRender::UpdateWorldMatrix()
 	{
-		if (m_renderToGBufferModel.IsInited())
+		if (m_renderToReserveModel.IsInited())
 		{
-			m_renderToGBufferModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+			m_renderToReserveModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
 		}
 		if (m_forwardRenderModel.IsInited())
 		{
@@ -171,9 +171,9 @@ namespace nsK2EngineLow
 
 	void ModelRender::Draw()
 	{
-		if (m_renderToGBufferModel.IsInited())
+		if (m_renderToReserveModel.IsInited())
 		{
-			g_renderingEngine.Add3DModelToRenderGBufferPass(m_renderToGBufferModel);
+			g_renderingEngine.Add3DModelToRenderReservePass(m_renderToReserveModel);
 		}
 		if (m_forwardRenderModel.IsInited())
 		{

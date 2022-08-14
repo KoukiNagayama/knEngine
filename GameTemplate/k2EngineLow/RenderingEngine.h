@@ -5,17 +5,6 @@ namespace nsK2EngineLow {
 
 	const int MAX_TEXT_SIZE = 256;
 
-	struct SFont
-	{
-		wchar_t s_text[MAX_TEXT_SIZE];
-		Vector3 s_position = Vector3::Zero;
-		Vector4 s_color = Vector4::White;
-		Vector2 s_pivot = Sprite::DEFAULT_PIVOT;
-		float	s_rotation = 0.0f;
-		float   s_scale = 1.0f;
-	};
-
-
 	class RenderingEngine
 	{
 	public:
@@ -29,12 +18,12 @@ namespace nsK2EngineLow {
 		/// <param name="rc">レンダリングコンテキスト</param>
 		void Execute(RenderContext& rc);
 		/// <summary>
-		/// GBufferの描画パスにモデルを追加
+		/// 準備用の描画パスにモデルを追加
 		/// </summary>
 		/// <param name="model"></param>
-		void Add3DModelToRenderGBufferPass(Model& model)
+		void Add3DModelToRenderReservePass(Model& model)
 		{
-			m_renderToGBufferModels.push_back(&model);
+			m_renderToReservePassModels.push_back(&model);
 		}
 		/// <summary>
 		/// フォワードレンダリングの描画パスにモデルを追加
@@ -53,20 +42,12 @@ namespace nsK2EngineLow {
 			m_sprites.push_back(&sprite);
 		}
 		/// <summary>
-		/// フォント描画パスにフォントを追加
-		/// </summary>
-		/// <param name="font"></param>
-		void AddFontToFontRenderPass(Font& font)
-		{
-			m_fonts.push_back(&font);
-		}
-		/// <summary>
 		/// 深度値記録用のレンダリングターゲットを取得
 		/// </summary>
 		/// <returns>深度値記録用レンダリングターゲット</returns>
 		RenderTarget& GetDepthValue()
 		{
-			return m_gBuffer[enGBufferDepth];
+			return m_reserveRenderTarget[enReserveDepth];
 		}
 		/// <summary>
 		/// ワールド座標記録用のレンダリングターゲットを取得
@@ -74,7 +55,7 @@ namespace nsK2EngineLow {
 		/// <returns>ワールド座標記録用のレンダリングターゲット</returns>
 		RenderTarget& GetWorldPos()
 		{
-			return m_gBuffer[enGBufferWorldPos];
+			return m_reserveRenderTarget[enReserveWorldPos];
 		}
 		/// <summary>
 		/// 法線記録用のレンダリングターゲットを取得
@@ -82,7 +63,7 @@ namespace nsK2EngineLow {
 		/// <returns>法線記録用のレンダリングターゲット</returns>
 		RenderTarget& GetNormal()
 		{
-			return m_gBuffer[enGBufferNormal];
+			return m_reserveRenderTarget[enReserveNormal];
 		}
 	private:
 		/// <summary>
@@ -94,18 +75,18 @@ namespace nsK2EngineLow {
 		/// </summary>
 		void InitCopyMainRenderTargetToFrameBufferSprite();
 		/// <summary>
-		/// G-Bufferを初期化
+		/// 準備用レンダリングターゲットを初期化
 		/// </summary>
-		void InitGBuffer();
+		void InitReserveRenderTarget();
 		/// <summary>
 		/// 2D描画用レンダリングターゲットを初期化
 		/// </summary>
 		void Init2DRenderTarget();
 		/// <summary>
-		/// G-Bufferへの描画
+		/// 準備用パスへの描画
 		/// </summary>
 		/// <param name="rc">レンダリングコンテキスト</param>
-		void RenderToGBuffer(RenderContext& rc);
+		void RenderToReservePass(RenderContext& rc);
 		/// <summary>
 		/// フォワードレンダリング
 		/// </summary>
@@ -127,22 +108,20 @@ namespace nsK2EngineLow {
 		/// <param name="rc">レンダリングコンテキスト</param>
 		void CopyMainRenderTargetToFrameBuffer(RenderContext& rc);
 	private:
-		// G-Bufferの定義
-		enum EnGBuffer
+		// Reserveパスのレンダリングターゲットの種類
+		enum EnReserve
 		{
-			enGBufferDepth,				// 深度
-			enGBufferNormal,			// 法線
-			enGBufferWorldPos,			// ワールド座標
-			enGBufferNum,				// G-Bufferの数
+			enReserveDepth,				// 深度
+			enReserveNormal,			// 法線
+			enReserveWorldPos,			// ワールド座標
+			enReserveNum,				// G-Bufferの数
 		};
 
-		std::vector<Model*>		m_renderToGBufferModels;				// G-Bufferの描画パスで描画されるモデル
+		std::vector<Model*>		m_renderToReservePassModels;			// Reserveの描画パスで描画されるモデル
 		std::vector<Model*>		m_forwardRenderModels;					// フォワードレンダリングの描画パスで描画されるモデル
 		std::vector<Sprite*>	m_sprites;								// スプライトの描画パスで描画するスプライト
-		std::vector<Font*>		m_fonts;								// フォントの描画パスで描画するフォント
-		std::vector<SFont*>		m_sfonts;								// フォントの描画に必要な情報
 		RenderTarget			m_mainRenderTarget;						// メインレンダリングターゲット
-		RenderTarget			m_gBuffer[enGBufferNum];				// G-Buffer用のレンダリングターゲット
+		RenderTarget			m_reserveRenderTarget[enReserveNum];	// G-Buffer用のレンダリングターゲット
 		RenderTarget			m_2DRenderTarget;						// 2D描画用のレンダリングターゲット
 		Sprite					m_copyMainRtToFrameBufferSprite;		// メインレンダリングターゲットの内容をフレームバッファにコピーする用のスプライト
 		Sprite					m_2DSprite;								// 2D合成用スプライト
