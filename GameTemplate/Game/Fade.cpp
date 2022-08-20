@@ -3,9 +3,6 @@
 
 namespace
 {
-	//const Vector3	SCALE = Vector3(1.436f, 1.436f, 1.0f);
-	//const Vector3	POSITION = Vector3(-90.0f, 7.75, 0.0f);
-
 	const float MAX_ALPHA_VALUE = 1.0f;				// α値の最大
 	const float MIN_ALPHA_VALUE = 0.0f;				// α値の最小
 	const float MUL_RGB_VALUE = 1.0f;				// 乗算するRGBの要素の数値

@@ -175,7 +175,7 @@ namespace nsK2EngineLow {
 
 	private:
 		Model									m_forwardRenderModel;							// フォワードレンダリングで描画されるモデル
-		Model									m_renderToReserveModel;							// RenderToGBufferで描画されるモデル
+		Model									m_renderToReserveModel;							// RenderToReservePassで描画されるモデル
 		Skeleton								m_skeleton;										// スケルトン
 		Animation								m_animation;									// アニメーション
 		AnimationClip*							m_animationClips;								// アニメーションクリップ

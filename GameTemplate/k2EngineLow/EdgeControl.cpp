@@ -1,6 +1,11 @@
 #include "k2EngineLowPreCompile.h"
 #include "EdgeControl.h"
 
+namespace
+{
+
+}
+
 namespace nsK2EngineLow
 {
 
@@ -52,5 +57,4 @@ namespace nsK2EngineLow
 		m_cbSoundSourceData.s_numSoundSource = 0;
 
 	}
-	EdgeControl g_edgeControl;
 }

@@ -37,6 +37,7 @@ bool CollectItem::Start()
 		EDGE_COLOR_YELLOW,
 		m_edgeManagement->GetEdgeControl()
 	);
+
 	// ƒ‚ƒfƒ‹‚ÌŠg‘å—¦‚ğİ’èB
 	m_itemModel.SetScale(ITEM_MODEL_SCALE);
 

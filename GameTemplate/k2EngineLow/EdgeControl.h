@@ -107,7 +107,6 @@ namespace nsK2EngineLow
 		float				m_sizeOfColorValue = 0.0f;							// 色の数値の大きさ
 		SizeChangeState		m_sizeChangeState = enSizeChange_ValueIncrease;		// 数値変更ステート
 	};
-	extern EdgeControl g_edgeControl;
 }
 
 

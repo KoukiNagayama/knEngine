@@ -15,7 +15,6 @@ namespace
 	const int INIT_DIGIT_VALUE = 1;											// 桁を初期化
 	const int INIT_NUMBER_VALUE = 0;										// 求める数を初期化
 	const int DIGIT_EXTRACTION_VALUE = 10;									// 桁を抽出する値
-	const int 
 }
 
 Score::Score()
@@ -74,8 +73,8 @@ Score::Score()
 
 void Score::Update()
 {
+	// 現在のスコアを取得
 	m_score = m_game->GetScore();
-
 	m_highScore = m_game->GetHighScore();
 
 	// 現在のスコアが記録されたスコアと一致していないならば。

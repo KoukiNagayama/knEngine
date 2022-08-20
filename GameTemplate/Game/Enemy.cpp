@@ -5,6 +5,12 @@
 #include "EdgeManagement.h"
 #include "sound/SoundEngine.h"
 #include "Game.h"
+#include "EnemyWalkState.h"
+#include "EnemyChaseState.h"
+#include "EnemyScreamState.h"
+#include "EnemyReturnToPathState.h"
+#include "EnemySurveyState.h"
+#include "EnemyAttackState.h"
 
 
 namespace
@@ -34,7 +40,10 @@ namespace
 	const float ENEMY_FOOTSTEP_SOUND_MINIMUM_VOLUME = 0.0f;			// 足音の最小音量
 	const float FOOTSTEP_RANGE_TO_PLAYER = 1350.0f;					// 足音がプレイヤーに届く範囲
 	const float TIME_TO_END_SCREAM_PER_SEC = 3.0f;					// 咆哮が終了するまでの時間
+	const int   MATCH_ANIMATION_EVENT_NAME = 0;						// アニメーションイベントの名前が一致しているか
+	const int	ENEMY_SOUND_PRIORITY = 0;							// エネミーに関する音の実行優先順位(早め)
 }
+
 
 Enemy::~Enemy()
 {
@@ -43,6 +52,9 @@ Enemy::~Enemy()
 	}
 	if (m_screamSound != nullptr) {
 		DeleteGO(m_screamSound);
+	}
+	if (m_iEnemyState != nullptr) {
+		delete m_iEnemyState;
 	}
 }
 
@@ -117,6 +129,10 @@ bool Enemy::Start()
 	g_soundEngine->ResistWaveFileBank(ENEMY_RUN_SOUND_NUMBER_TO_REGISTER, "Assets/sound/enemy/run2.wav");
 	// 咆哮の音の登録。
 	g_soundEngine->ResistWaveFileBank(ENEMY_SCREAM_SOUND_NUMBER_TO_REGISTER, "Assets/sound/enemy/scream.wav");
+	
+	// 初期ステートを歩きに指定
+	m_iEnemyState = new EnemyWalkState( this );
+
 	return true;
 }
 
@@ -148,66 +164,17 @@ void Enemy::Rotation()
 
 void Enemy::ManageState()
 {
-	switch (m_enemyState) {
-		// 歩き状態
-	case enEnemyState_Walk:
-		ProcessWalkStateTransition();
-		break;
-		// 咆哮状態
-	case enEnemyState_Scream:
-		ProcessScreamStateTransition();
-		break;
-		// 追跡状態
-	case enEnemyState_Chase:
-		ProcessChaseStateTransition();
-		break;
-		// 見回し状態
-	case enEnemyState_Survey:
-		ProcessSurveyStateTransition();
-		break;
-		// パス移動への帰還状態
-	case enEnemyState_ReturnToPath:
-		ProcessReturnToPathStateTransition();
-		break;
-		// 攻撃状態
-	case enEnemyState_Attack:
-		ProcessAttackStateTransition();
-		break;
-	}
+	m_iEnemyState->ManageState();
 }
 
 void Enemy::ProcessByState()
 {
-	switch (m_enemyState) {
-		// 歩き状態
-	case enEnemyState_Walk:
-		Walk();
-		SearchSoundOfPlayer();
-		break;
-		// 咆哮状態
-	case enEnemyState_Scream:
-		Scream();
-		break;
-		// 追跡状態
-	case enEnemyState_Chase:
-		Chase();
-		SearchSoundOfPlayer();
-		break;
-		// 見回し状態
-	case enEnemyState_Survey:
-		Survey();
-		SearchSoundOfPlayer();
-		break;
-		// パス移動への帰還状態
-	case enEnemyState_ReturnToPath:
-		ReturnToPath();
-		SearchSoundOfPlayer();
-		break;
-		// 攻撃状態
-	case enEnemyState_Attack:
-		Attack();
-		break;
-	}
+	m_iEnemyState->ProcessByState();
+}
+
+void Enemy::PlayAnimation()
+{
+	m_iEnemyState->PlayAnimation();
 }
 
 void Enemy::SearchSoundOfPlayer()
@@ -242,362 +209,60 @@ void Enemy::SearchSoundOfPlayer()
 	m_isFound = false;
 }
 
-void Enemy::Walk()
+void Enemy::ChangeState(EnEnemyState nextState)
 {
-	// 目的地までの距離
-	Vector3 distance = m_point->s_position - m_position;
-
-	// 目的地までの距離が近ければ
-	if (distance.Length() <= DISTANCE_TO_TARGET_WHILE_WALKING) {
-		// 現在最後のポイントにいるならば
-		if (m_point->s_number == m_enemyPath.GetPointListSize() - 1) {
-			// 最初のポイント情報を取得
-			m_point = m_enemyPath.GetFirstPoint();
-		}
-		// 最後以外のポイントにいるならば
-		else {
-			// 次のポイント情報を取得
-			m_point = m_enemyPath.GetNextPoint(m_point->s_number);
-		}
-
+	if (m_iEnemyState != nullptr) {
+		delete m_iEnemyState;
 	}
-
-	// 移動する方向を設定
-	m_moveVector = distance;
-	m_moveVector.Normalize();
-
-	// 歩き時の移動速度を設定
-	m_moveSpeed = m_moveVector * WALK_SPEED;
-
-	// 座標に移動速度を加算
-	m_position += m_moveSpeed;
-}
-
-void Enemy::Scream()
-{
-	// 咆哮の音源を鳴らす
-	if (m_screamSound == nullptr) {
-		m_screamSound = NewGO<SoundSource>(0);
-		m_screamSound->Init(ENEMY_SCREAM_SOUND_NUMBER_TO_REGISTER);
-		m_screamSound->SetVolume(SCREAM_VOLUME);
-		m_screamSound->Play(false);
-		m_isScream = true;
-	}
-
-	// タイマー。
-	m_screamEndTimer -= g_gameTime->GetFrameDeltaTime();
-
-	if (m_screamEndTimer <= 0.0f) {
-		m_isScream = false;
-		m_screamSound = nullptr;
-	}
-}
-
-
-void Enemy::Chase()
-{
-	// ターゲットとなるプレイヤーの座標を取得
-	Vector3	playerPos = m_player->GetPosition();
-
-	if (m_pathFindingTimer <= 0.0f) {
-		// プレイヤーまでのパスを検索
-		m_pathFinding.Execute(
-			m_path,
-			m_nvmMesh,
-			m_position,
-			playerPos,
-			PhysicsWorld::GetInstance(),
-			ENEMY_RADIUS,
-			ENEMY_HEIGHT
-		);
-		// タイマーリセット
-		m_pathFindingTimer = PATH_FINDING_TIMER;
-	}
-
-	m_pathFindingTimer -= g_gameTime->GetFrameDeltaTime();
-
-	// 指定した座標への移動が完了したか
-	bool isEnd;
-	// 移動直前の座標を記録
-	m_lastPosition = m_position;
-
-	// 最低追跡する残り時間
-	// 追跡する残り時間を減らす
-	m_chaseTime -= g_gameTime->GetFrameDeltaTime();
-	// 追跡する残り時間が0になったなら
-	if (m_chaseTime < 0.0f) {
-		m_chaseTime = 0.0f;
-	}
-
-
-	// 設定されたパスをもとに移動
-	m_position = m_path.Move(
-		m_position,
-		RUN_SPEED,
-		isEnd
-	);
-
-	// 方向
-	// 直前の座標と現在の座標を比較して移動した方向を求める
-	Vector3 momentDist = m_position - m_lastPosition;
-	momentDist.Normalize();
-
-	// 移動する方向を設定
-	m_moveVector = momentDist;
-
-	// プレイヤーとの距離
-	Vector3 distanceToPlayer = m_position - playerPos;
-	// プレイヤーとの距離が近ければ
-	if (distanceToPlayer.Length() <= ATTACKING_RANGE) {
-		// 攻撃を行う
-		m_isAttackable = true;
-	}
-}
-
-void Enemy::Survey()
-{
-	// 見回した時間を加算
-	m_surveyTimer += g_gameTime->GetFrameDeltaTime();
-}
-
-void Enemy::ReturnToPath()
-{
-	bool isEnd;
-
-	// 移動直前の座標を記録
-	m_lastPosition = m_position;
-
-	// パスを検索していないならば
-	if (m_isPathFindingWhileReturning == false) {
-		// 現在の座標から一番近い座標のポイントを取得
-		m_point = m_enemyPath.GetNearPoint(m_position);
-		// 帰還目標のパスまでのパスを検索
-		m_pathFinding.Execute(
-			m_path,
-			m_nvmMesh,
-			m_position,
-			m_point->s_position,
-			PhysicsWorld::GetInstance(),
-			ENEMY_RADIUS,
-			ENEMY_HEIGHT
-		);
-		m_isPathFindingWhileReturning = true;
-	}
-
-	// 設定されたパスをもとに移動
-	m_position = m_path.Move(
-		m_position,
-		WALK_SPEED,
-		isEnd
-	);
-
-	// 直前の座標と現在の座標を比較して移動した方向を求める
-	Vector3 distance = m_position - m_lastPosition;
-	distance.Normalize();
-
-	// 移動する方向を設定
-	m_moveVector = distance;
-}
-
-void Enemy::Attack()
-{
-	// ターゲットとなるプレイヤーの座標を取得
-	Vector3	playerPos = m_player->GetPosition();
-
-	Vector3 distance = playerPos - m_position;
-	distance.Normalize();
-
-	m_moveVector = distance;
-}
-
-void Enemy::ProcessWalkStateTransition()
-{
-	// 敵を発見していないならば
-	if (m_isFound == false) {
-		m_isMove = true;
-		return;
-	}
-	// 咆哮をリセット
-	m_screamRateByTime = 0.0f;
-	m_isScream = true;
-	m_isMove = false;
-	// 咆哮が終了するまでのタイマーをリセット。
-	m_screamEndTimer = TIME_TO_END_SCREAM_PER_SEC;
-	// ステートを咆哮状態にする
-	m_enemyState = enEnemyState_Scream;
-
-}
-
-void Enemy::ProcessScreamStateTransition()
-{
-	// 咆哮が終了していないならば
-	if (m_isScream == true) {
-		return;
-	}
-	m_isMove = true;
-	// 最低限追跡する時間を指定
-	m_chaseTime = MINIMUM_CHASE_TIME;
-	// ステートを追跡状態にする
-	m_enemyState = enEnemyState_Chase;
-	// 追跡しているように記録。
-	m_isChase = true;
-}
-
-void Enemy::ProcessChaseStateTransition()
-{
-	// プレイヤーを攻撃可能な距離ならば
-	if (m_isAttackable == true) {
-		m_enemyState = enEnemyState_Attack;
-		// ゲームオーバーエフェクトの開始
-		m_game->StartGameOverEffect();
-		m_isMove = false;
-		return;
-	}
-	// 敵を追跡する状態が維持されているならば
-	if (m_chaseTime > 0.0f || m_isFound == true) {
-		return;
-	}
-	// プレイヤーを見失っていたならば
-	if (m_isFound == false) {
-		// 見回す時間をリセット
-		m_surveyTimer = 0.0f;
-		// ステートを見回し状態にする
-		m_enemyState = enEnemyState_Survey;
-		// パスを検索する間隔をリセット
-		m_pathFindingTimer = PATH_FINDING_TIMER;
-		m_isMove = false;
-		m_isChase = false;
-
-	}
-
-}
-
-void Enemy::ProcessSurveyStateTransition()
-{
-	// 一定時間以内にプレイヤーを発見
-	if (m_isFound == true) {
-		// 最低限追跡する時間を指定
-		m_chaseTime = MINIMUM_CHASE_TIME;
-		// 追跡を開始
-		m_enemyState = enEnemyState_Chase;
-		// 追跡する。
-		m_isChase = true;
-
-		m_isMove = true;
-	}
-	// 一定時間プレイヤーを見失っていたら
-	if (m_surveyTimer > TIME_TO_LOSE_SIGHT) {
-		// 帰還状態の時間を指定
-		m_timeToReturn = TIME_TO_FORCE_STATE_TRANSITION;
-		// ステートをパスへの帰還状態にする
-		m_enemyState = enEnemyState_ReturnToPath;
-
-		m_isMove = true;
-	}
-
-}
-
-void Enemy::ProcessReturnToPathStateTransition()
-{
-	// 目標の座標と現在の座標の距離を測る
-	Vector3 distance = m_point->s_position - m_position;
-
-	m_timeToReturn -= g_gameTime->GetFrameDeltaTime();
-
-	// プレイヤーを発見したら
-	if (m_isFound == true) {
-		// 咆哮をリセット
-		m_screamRateByTime = 0.0f;
-		m_isScream = true;
-		// 咆哮が終了するまでのタイマーをリセット。
-		m_screamEndTimer = TIME_TO_END_SCREAM_PER_SEC;
-		// ステートを咆哮状態にする
-		m_enemyState = enEnemyState_Scream;
-
-
-		m_isMove = false;
-	}
-	// 目標の座標に近くなったら
-	else if (distance.Length() < DISTANCE_TO_TARGET_WHILE_RETURNING) {
-		// ステートを歩き状態にする
-		m_enemyState = enEnemyState_Walk;
-
-	}
-	// 一定時間以内に帰還できなかった場合
-	else if (m_timeToReturn <= 0.0f) {
-		// 強制的にステートを歩き状態にする
-		m_enemyState = enEnemyState_Walk;
-
-	}
-	m_isPathFindingWhileReturning = false;
-}
-
-void Enemy::ProcessAttackStateTransition()
-{
-	// ゲームオーバー
-	m_attackingTimer -= g_gameTime->GetFrameDeltaTime();
-	if (m_attackingTimer <= 0.0f && m_isCaughtPlayer == false) {
-		m_isCaughtPlayer = true;
-		m_game->SetGameOver();
-	}
-}
-
-void Enemy::PlayAnimation()
-{
-	switch (m_enemyState) {
-		// 歩き
+	switch (nextState) {
 	case enEnemyState_Walk:
-		m_enemyModel.PlayAnimation(enAnimationClip_Walk, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemyWalkState(this);
 		break;
-		// 咆哮
 	case enEnemyState_Scream:
-		m_enemyModel.PlayAnimation(enAnimationClip_Scream, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemyScreamState(this);
 		break;
-		// 追跡
 	case enEnemyState_Chase:
-		m_enemyModel.PlayAnimation(enAnimationClip_Run, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemyChaseState(this);
 		break;
-		// 見回し
 	case enEnemyState_Survey:
-		m_enemyModel.PlayAnimation(enAnimationClip_Survey, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemySurveyState(this);
 		break;
-		// パスへの帰還
 	case enEnemyState_ReturnToPath:
-		m_enemyModel.PlayAnimation(enAnimationClip_Walk, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemyReturnToPathState(this);
 		break;
-		// 攻撃
 	case enEnemyState_Attack:
-		m_enemyModel.PlayAnimation(enAnimationClip_Attack, INTERPOLATION_TIME_FOR_ANIMATION);
+		m_iEnemyState = new EnemyAttackState(this);
 		break;
 	}
+	m_enemyState = nextState;
 }
 
 void Enemy::OnStepAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
 {
 	//キーの名前が「walk1」の時。
-	if (wcscmp(eventName, L"walk1") == 0) {
-		m_stepSound = NewGO<SoundSource>(0);
+	if (wcscmp(eventName, L"walk1") == MATCH_ANIMATION_EVENT_NAME) {
+		m_stepSound = NewGO<SoundSource>(ENEMY_SOUND_PRIORITY);
 		m_stepSound->Init(ENEMY_WALK_SOUND_NUMBER_TO_REGISTER);
 		m_stepSound->Play(false);
 		StepVolumeControl();
 	}
 	//キーの名前が「walk2」の時。
-	else if (wcscmp(eventName, L"walk2") == 0) {
-		m_stepSound = NewGO<SoundSource>(0);
+	else if (wcscmp(eventName, L"walk2") == MATCH_ANIMATION_EVENT_NAME) {
+		m_stepSound = NewGO<SoundSource>(ENEMY_SOUND_PRIORITY);
 		m_stepSound->Init(ENEMY_WALK_SOUND_NUMBER_TO_REGISTER);
 		m_stepSound->Play(false);
 		StepVolumeControl();
 	}
 	//キーの名前が「run1」の時。
-	else if (wcscmp(eventName, L"run1") == 0) {
-		m_stepSound = NewGO<SoundSource>(0);
+	else if (wcscmp(eventName, L"run1") == MATCH_ANIMATION_EVENT_NAME) {
+		m_stepSound = NewGO<SoundSource>(ENEMY_SOUND_PRIORITY);
 		m_stepSound->Init(ENEMY_RUN_SOUND_NUMBER_TO_REGISTER);
 		m_stepSound->Play(false);
 		StepVolumeControl();
 	}
 	//キーの名前が「run2」の時。
-	else if (wcscmp(eventName, L"run2") == 0) {
-		m_stepSound = NewGO<SoundSource>(0);
+	else if (wcscmp(eventName, L"run2") == MATCH_ANIMATION_EVENT_NAME) {
+		m_stepSound = NewGO<SoundSource>(ENEMY_SOUND_PRIORITY);
 		m_stepSound->Init(ENEMY_RUN_SOUND_NUMBER_TO_REGISTER);
 		m_stepSound->Play(false);
 		StepVolumeControl();

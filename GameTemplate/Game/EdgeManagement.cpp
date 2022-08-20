@@ -50,8 +50,6 @@ void EdgeManagement::Init()
 	}
 	
 
-
-
 	// ƒxƒ‹‚Ì—ÖŠsü‚Ö‚Ì‰e‹¿‚ð‰Šú‰»B
 	m_edgeControl.Init(
 		enSoundSourceData_Bell,
@@ -107,15 +105,6 @@ void EdgeManagement::Init()
 		TITLE_OUTLINE_RATE
 	);
 	m_edgeControl.SetIsSound(enSoundSourceData_Title, IS_NOT_SOUND);
-
-	// ƒ^ƒCƒgƒ‹‚ÌŽž‚Ìƒxƒ‹‚Ì‰¹‚Ì—ÖŠsü‚Ö‚Ì‰e‹¿‚ð‰Šú‰»B
-	/*m_edgeControl.Init(
-		enSoundSourceData_BellAfterTitle,
-		Vector3::Zero,
-		BELL_RANGE,
-		enSoundSourceData_BellAfterTitle
-	);
-	m_edgeControl.SetIsSound(enSoundSourceData_BellAfterTitle, IS_NOT_SOUND);*/
 
 	// ƒGƒlƒ~[2‚Ì‘«‰¹‚Ì—ÖŠsü‚Ö‚Ì‰e‹¿‚ð‰Šú‰»B
 	m_edgeControl.Init(
@@ -173,12 +162,6 @@ void EdgeManagement::Update()
 
 	// ŽžŠÔ‚É‚æ‚é‰e‹¿—¦‚ðŽw’èB
 	SpecifyRateByTime();
-
-	//m_edgeControl.SetPosition(enSoundSourceData_BellAfterTitle, m_player->GetPosition());
-
-	//m_edgeControl.SetRate(enSoundSourceData_BellAfterTitle, m_rateByTimeOfBellAfterTitle);
-
-
 }
 
 void EdgeManagement::Clear()

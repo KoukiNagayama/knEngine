@@ -68,7 +68,7 @@ private:
 	Quaternion		m_rotation = Quaternion::Identity;	// カメラの回転
 	//bool			m_isTargetInRange = true;			// 注視点がカメラの回転の範囲内であるならば
 	Vector3			m_target = Vector3::Zero;			// 注視点
-	bool			m_isMovable = true;			// 移動が可能か？
+	bool			m_isMovable = true;					// 移動が可能か？
 
 };	
 

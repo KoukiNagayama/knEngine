@@ -20,7 +20,7 @@
 
 namespace
 {
-	const int PLAYABLE_TIME_PER_SEC = 10.0f;					// 秒ごとで制限時間を3分に設定。
+	const int PLAYABLE_TIME_PER_SEC = 180.0f;					// 秒ごとで制限時間を設定。
 	const int GAME_END_TIME_PER_SEC = 0.0f;						// 秒ごとでゲームが終了する時間
 	const int PICK_UP_BELL_NUMBER_TO_REGISTER = 9;				// ベルを取得した音の登録番号
 	const int ESCAPE_SOUND_NUMBER_TO_REGISTER = 10;				// 逃走時の音の登録番号

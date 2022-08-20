@@ -14,6 +14,17 @@ class EdgeManagement;
 class Game;
 class Enemy : public IGameObject
 {
+private:
+	// ステート
+	enum EnEnemyState {
+		enEnemyState_Walk,				// 歩き	
+		enEnemyState_Scream,			// 咆哮
+		enEnemyState_Chase,				// 追跡
+		enEnemyState_Survey,			// 見回し
+		enEnemyState_ReturnToPath,		// パス移動に戻る
+		enEnemyState_Attack,			// 攻撃
+		enEnemyState_Num,				// ステートの数
+	};
 public:
 	Enemy() {};
 	~Enemy();
@@ -126,54 +137,6 @@ private:
 	/// </summary>
 	void ProcessByState();
 	/// <summary>
-	/// 通常移動
-	/// </summary>
-	void Walk();
-	/// <summary>
-	/// 咆哮
-	/// </summary>
-	void Scream();
-	/// <summary>
-	/// 追跡
-	/// </summary>
-	void Chase();
-	/// <summary>
-	/// 見回し
-	/// </summary>
-	void Survey();
-	/// <summary>
-	/// パス移動への帰還
-	/// </summary>
-	void ReturnToPath();
-	/// <summary>
-	/// 攻撃
-	/// </summary>
-	void Attack();
-	/// <summary>
-	/// 歩き時のステート遷移
-	/// </summary>
-	void ProcessWalkStateTransition();
-	/// <summary>
-	/// 追跡時のステート遷移
-	/// </summary>
-	void ProcessChaseStateTransition();
-	/// <summary>
-	/// 攻撃時のステート遷移
-	/// </summary>
-	void ProcessAttackStateTransition();
-	/// <summary>
-	/// 叫び時のステート遷移
-	/// </summary>
-	void ProcessScreamStateTransition();
-	/// <summary>
-	/// 見回し時のステート遷移
-	/// </summary>
-	void ProcessSurveyStateTransition();
-	/// <summary>
-	/// パス移動への帰還時のステート遷移
-	/// </summary>
-	void ProcessReturnToPathStateTransition();
-	/// <summary>
 	/// アニメーション再生
 	/// </summary>
 	void PlayAnimation();
@@ -191,17 +154,20 @@ private:
 	/// 足音の音量制御
 	/// </summary>
 	void StepVolumeControl();
+	/// <summary>
+	/// 状態を切り替える。
+	/// </summary>
+	/// <param name="nextState"></param>
+	void ChangeState(EnEnemyState nextState);
 private:
-	// ステート
-	enum EnEnemyState {
-		enEnemyState_Walk,				// 歩き	
-		enEnemyState_Scream,			// 咆哮
-		enEnemyState_Chase,				// 追跡
-		enEnemyState_Survey,			// 見回し
-		enEnemyState_ReturnToPath,		// パス移動に戻る
-		enEnemyState_Attack,			// 攻撃
-		enEnemyState_Num,				// ステートの数
-	};
+	friend class EnemyWalkState;
+	friend class EnemyChaseState;
+	friend class EnemyReturnToPathState;
+	friend class EnemyScreamState;
+	friend class EnemySurveyState;
+	friend class EnemyAttackState;
+
+	
 
 	// アニメーション
 	enum EnAnimationClip {
@@ -244,10 +210,10 @@ private:
 	float					m_attackingTimer = 1.5f;					// 攻撃の演出までの時間
 	bool					m_isCaughtPlayer = false;					// プレイヤーを捕まえているか
 	EdgeManagement*			m_edgeManagement = nullptr;					// 輪郭線情報
-	SoundSource*			m_stepSound = nullptr;
-	SoundSource*			m_screamSound = nullptr;
-	Game*					m_game = nullptr;
-	bool					m_isChase = false;
+	SoundSource*			m_stepSound = nullptr;						// 足音の音源オブジェクト
+	SoundSource*			m_screamSound = nullptr;					// 咆哮の音源オブジェクト
+	Game*					m_game = nullptr;							// ゲームクラス
+	bool					m_isChase = false;							// 追跡しているか
 	float					m_screamEndTimer = 0.0f;					// 咆哮終了までのタイマー
 	IEnemyState*			m_iEnemyState = nullptr;
 

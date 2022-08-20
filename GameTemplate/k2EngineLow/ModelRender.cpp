@@ -3,6 +3,13 @@
 #include "RenderingEngine.h"
 #include "EdgeControl.h"
 
+namespace
+{
+	const int NORMAL_MODEL_NUM = 0;			// 通常モデル
+	const int ENEMY_MODEL_NUM = 1;			// エネミーモデル
+	const int COLLECT_ITEM_MODEL_NUM = 2;	// 回収アイテムモデル
+}
+
 namespace nsK2EngineLow
 {
 	void ModelRender::Init(const char* filePath,
@@ -59,13 +66,13 @@ namespace nsK2EngineLow
 		// tkmファイルのファイルパスを指定する。
 		modelInitData.m_tkmFilePath = filePath;
 		// シェーダーファイルのファイルパスを指定する。
-		if (outlineType == 0) {
-			modelInitData.m_fxFilePath = "Assets/shader/forwardRenderForNormalModel.fx";
+		if (outlineType == NORMAL_MODEL_NUM) {
+			modelInitData.m_fxFilePath = "Assets/shader/normalModel.fx";
 		}
-		else if (outlineType == 1) {
+		else if (outlineType == ENEMY_MODEL_NUM) {
 			modelInitData.m_fxFilePath = "Assets/shader/enemy.fx";
 		}
-		else if (outlineType == 2) {
+		else if (outlineType == COLLECT_ITEM_MODEL_NUM) {
 			modelInitData.m_fxFilePath = "Assets/shader/collectItem.fx";
 		}
 		// エントリーポイントを指定する。
